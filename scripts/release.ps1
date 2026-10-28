@@ -66,8 +66,11 @@ if ($Version -notmatch '^\d+\.\d+\.\d+$') {
 if ([version]$Version -le [version]$CurrentVersion) {
     Fail "new version $Version must be greater than $CurrentVersion"
 }
+$ErrorActionPreference = "Continue"
 gh release view "v$Version" *> $null
-if ($LASTEXITCODE -eq 0) {
+$ReleaseExists = $LASTEXITCODE -eq 0
+$ErrorActionPreference = "Stop"
+if ($ReleaseExists) {
     Fail "GitHub Release v$Version already exists"
 }
 
