@@ -26,14 +26,17 @@ function setTheme(theme?: string) {
 }
 
 function updateWindowHeight() {
-  requestAnimationFrame(() => {
-    const height = Math.ceil(stack.getBoundingClientRect().height)
-    if (height > 0) {
-      void ResizeToastWindow(height).catch(error => {
-        console.error('[Toast] 调整通知窗口失败', error)
-      })
-    }
-  })
+  // The toast window starts hidden, and WebView2 can suspend
+  // requestAnimationFrame for hidden windows. Measuring synchronously is what
+  // actually brings the window on screen via ResizeToastWindow.
+  const height = Math.ceil(stack.getBoundingClientRect().height)
+  if (height > 0) {
+    void ResizeToastWindow(height).catch(error => {
+      console.error('[Toast] 调整通知窗口失败', error)
+    })
+    return
+  }
+  setTimeout(updateWindowHeight, 40)
 }
 
 function clearCloseTimer(id: number) {
