@@ -39,6 +39,9 @@ func setupUpdater(app *application.App) error {
 	return app.Updater.Init(updater.Config{
 		CurrentVersion: appVersion,
 		Providers:      []updater.Provider{provider},
+		Window: &updater.BuiltinWindow{
+			Options: updater.WindowOptions{Title: "Notice 更新"},
+		},
 	})
 }
 
