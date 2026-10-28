@@ -1,0 +1,31 @@
+# Local tooling
+.dsh-ops/
+.task/
+.vscode/
+.idea/
+
+# Wails build output
+bin/
+frontend/dist/
+frontend/node_modules/
+build/windows/nsis/MicrosoftEdgeWebview2Setup.exe
+
+# Go build output
+*.exe
+*.syso
+
+# Backend local secrets and logs
+backend/config.yaml
+backend/logs/
+*.log
+
+# Local environment overrides
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# TypeScript build info
+*.tsbuildinfo

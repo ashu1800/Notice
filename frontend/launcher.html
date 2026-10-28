@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notice</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .launcher {
+        text-align: center;
+        color: white;
+      }
+      .launcher h1 {
+        font-size: 36px;
+        margin-bottom: 40px;
+      }
+      .launcher-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .launcher-btn {
+        padding: 14px 40px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        backdrop-filter: blur(10px);
+      }
+      .launcher-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.02);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="launcher">
+      <h1>Notice</h1>
+      <div class="launcher-buttons">
+        <button class="launcher-btn" id="open-main">打开主窗口</button>
+        <button class="launcher-btn" id="minimize-to-tray">最小化到托盘</button>
+      </div>
+    </div>
+    <script type="module" src="/src/launcher/launcher.ts"></script>
+  </body>
+</html>

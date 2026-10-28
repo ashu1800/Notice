@@ -1,0 +1,15 @@
+{
+	"fixed": {
+		"file_version": "1.0.0"
+	},
+	"info": {
+		"0409": {
+			"ProductVersion": "1.0.0",
+			"CompanyName": "Notice",
+			"FileDescription": "Notice 消息订阅桌面客户端",
+			"LegalCopyright": "Copyright 2026 Notice",
+			"ProductName": "Notice",
+			"Comments": "Notice Desktop"
+		}
+	}
+}

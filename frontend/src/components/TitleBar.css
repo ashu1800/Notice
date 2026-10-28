@@ -1,0 +1,43 @@
+.titlebar {
+  height: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--titlebar-bg);
+  --wails-draggable: drag;
+}
+
+.titlebar-drag {
+  padding-left: 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.titlebar-buttons {
+  display: flex;
+  --wails-draggable: no-drag;
+}
+
+.titlebar-btn {
+  width: 46px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.titlebar-btn:hover {
+  background: var(--hover-bg);
+}
+
+.titlebar-btn.close:hover {
+  background: #e81123;
+  color: white;
+}

@@ -1,0 +1,35 @@
+请仔细分析Notice目录下的后端架构和功能和所有api接口实现以下开发需求：
+1.请根据后端提供的api接口编写一个Windows平台的桌面软件
+2.需要实现登录、注册（发邮件验证码）、订阅、通知等api提供的所有功能。
+3.生成一个单exe可执行程序
+4.使用Electron
+5.涉及到UI请使用skills
+6.软件登录后订阅websocket推送（账号下所有的订阅）
+7.软件主页需要以列表形式展示最新的消息（支持下滑刷新，上滑加载更多）
+8.展示用户订阅列表，支持手动新增或删除订阅
+9.新增订阅TOKEN和删除订阅TOKEN和订阅TOKEN列表功能只允许后台使用，此项目排除这三个接口，要和用户订阅token和取消订阅token区分开。
+10.收到新的websocket推送消息后，加入主页第一行列表显示，消息分为普通文本消息和markdown消息，需要支持markdown。
+11.收到新的websocket推送消息后，需要在PC电脑屏幕右下角弹窗提醒（不要用系统自带的弹窗）
+12.软件UI尽量用skills，要简约大气，符合PC桌面软件布局，需要有圆角，有亚克力效果
+13.软件主题色需要支持亮色模式和暗色模式，支持后台运行，可自定义设置开机启动。
+14.新项目请在目录NoticeDestop下进行开发。
+15.先用superpowers:brainstorming的skills进行头脑风暴，然后使用skills：superpowers:write-plan指定开发TDD，最后使用superpowers:execute-plan进行开发
+
+运行项目：
+  cd C:\Users\Ashu\Desktop\NoticeDestop
+  npm install
+  npm run dev
+
+
+  打包Windows版本：
+  npm run build:win
+
+目前项目还存在的BUG
+1.软件启动时有时候不弹出toast弹窗
+2.侧边栏下边的退出登录按钮图标更换一下
+
+问题应该没有出现在TOAST_MIN_HEIGHT和TOAST_MAX_HEIGHT上面，反而像是自适应高度计算有问题，计算的高度比实际的高度要低一些
+
+使用superpowers:write-plan重构toast弹窗位置和动画效果
+1.新的弹窗从上到下由隐到显（如果上方有窗口则从上方窗口的位置开始否则就从屏幕右上角开始），达到显示设置时间后再从下到上由显到隐藏逐渐消失
+2.当窗口消失时要重新计算窗口与上方的窗口位置
