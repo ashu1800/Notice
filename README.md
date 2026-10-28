@@ -55,6 +55,34 @@ wails3 package
 
 安装包产物：`bin/Notice-amd64-installer.exe`。
 
+## 自动更新
+
+应用通过 [GitHub Releases](https://github.com/ashu1800/Notice/releases) 检查更新：
+
+- 托盘菜单或「设置 → 关于 → 检查更新」打开更新窗口。
+- 发布资源包含 `Notice-windows-amd64.exe` 和 `SHA256SUMS`。
+- 下载后校验 SHA-256，再通过 Wails updater helper 替换当前进程并重启。
+- `VERSION` 是应用版本单一来源；`build/config.yml` 的版本在发布时同步更新。
+- 可通过 `NOTICE_GITHUB_REPO=owner/repo` 覆盖更新仓库（开发测试用）；私有仓库可设置 `NOTICE_GITHUB_TOKEN`。
+
+## 一键发布新版本
+
+发布脚本会跑测试、构建便携版与安装包、生成 `SHA256SUMS`、提交版本号、推送 `main`，并创建 GitHub Release：
+
+```powershell
+# 自动递增 patch，例如 1.0.0 -> 1.0.1
+.\scripts\release.cmd
+
+# 指定版本并跳过确认
+.\scripts\release.ps1 -Version 1.1.0 -Yes
+```
+
+要求：
+
+- `gh auth status` 已登录且有 `repo` 权限。
+- `wails3`、NSIS（`makensis`）在 PATH 中。
+- 工作区干净且当前分支为 `main`。
+
 ## 目录
 
 ```
@@ -66,6 +94,10 @@ Notice/
 ├── window_state.go         # 主窗口位置/尺寸记忆
 ├── toast_manager.go        # 独立透明通知窗口
 ├── tray.go                 # 托盘菜单
+├── updater.go              # GitHub Releases 自动更新
+├── VERSION                 # 当前应用版本（发布脚本维护）
+├── scripts/release.ps1     # 一键发布脚本
+├── scripts/release.cmd     # Windows 双击入口
 ├── build/                  # Wails 构建资源、平台配置
 ├── frontend/               # React 多页面前端
 │   ├── index.html          # 主窗口

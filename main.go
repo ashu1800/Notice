@@ -49,6 +49,9 @@ func main() {
 		},
 	})
 	desktop.setApp(app)
+	if err := setupUpdater(app); err != nil {
+		log.Fatal(err)
+	}
 	desktop.createMainWindow()
 	desktop.setupTray()
 
@@ -62,6 +65,7 @@ func main() {
 		} else {
 			desktop.showMainWindow()
 		}
+		checkForUpdatesOnStartup(app, logger)
 	})
 
 	if err := app.Run(); err != nil {

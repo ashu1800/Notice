@@ -16,6 +16,8 @@ export function SettingsPage() {
   const [closeToTray, setCloseToTray] = useState(false)
   const [showNotificationWindow, setShowNotificationWindow] = useState(true)
   const [notificationDuration, setNotificationDuration] = useState(5)
+  const [appVersion, setAppVersion] = useState('1.0.0')
+  const [checkingUpdate, setCheckingUpdate] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -27,11 +29,13 @@ export function SettingsPage() {
         const launcherSetting = await settingsService.getLauncherSetting()
         const closeBehaviorSetting = await settingsService.getCloseBehaviorSetting()
         const notificationSettings = await settingsService.getNotificationSettings()
+        const version = await settingsService.getAppVersion()
 
         if (!active) {
           return
         }
 
+        setAppVersion(version)
         setOpenAtLogin(settings.openAtLogin)
         setShowLauncherOnStartup(launcherSetting.showLauncherOnStartup)
         setCloseToTray(closeBehaviorSetting.closeToTray)
@@ -108,6 +112,17 @@ export function SettingsPage() {
       console.error('设置通知窗口失败', e)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCheckForUpdates = async () => {
+    setCheckingUpdate(true)
+    try {
+      await settingsService.checkForUpdates()
+    } catch (e) {
+      console.error('检查更新失败', e)
+    } finally {
+      setCheckingUpdate(false)
     }
   }
 
@@ -257,8 +272,15 @@ export function SettingsPage() {
         <div className="setting-item">
           <div className="setting-info">
             <span className="setting-label">Notice Desktop</span>
-            <span className="setting-desc">版本 1.0.0</span>
+            <span className="setting-desc">版本 {appVersion}</span>
           </div>
+          <button
+            className="theme-btn"
+            onClick={handleCheckForUpdates}
+            disabled={loading || checkingUpdate}
+          >
+            {checkingUpdate ? '正在检查...' : '检查更新'}
+          </button>
         </div>
       </div>
     </div>

@@ -27,6 +27,12 @@ func (s *DesktopService) setupTray() {
 	showItem.OnClick(func(_ *application.Context) {
 		s.showMainWindow()
 	})
+	checkUpdateItem := menu.Add("检查更新")
+	checkUpdateItem.OnClick(func(_ *application.Context) {
+		if err := s.CheckForUpdates(); err != nil {
+			s.logger.Error("检查更新失败", "error", err)
+		}
+	})
 	menu.AddSeparator()
 
 	enabled, err := s.app.Autostart.IsEnabled()

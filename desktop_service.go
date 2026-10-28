@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/url"
@@ -183,6 +184,23 @@ func (s *DesktopService) LauncherMinimize() error {
 	if s.mainWindow != nil {
 		s.mainWindow.Hide()
 	}
+	return nil
+}
+
+func (s *DesktopService) GetAppVersion() string {
+	return appVersion
+}
+
+// CheckForUpdates 打开 Wails 内置更新窗口，检查 GitHub Release 并按提示下载安装。
+func (s *DesktopService) CheckForUpdates() error {
+	if s.app == nil || s.app.Updater == nil {
+		return errors.New("自动更新器不可用")
+	}
+	go func() {
+		if err := s.app.Updater.CheckAndInstall(context.Background()); err != nil {
+			s.logger.Error("检查更新失败", "error", err)
+		}
+	}()
 	return nil
 }
 

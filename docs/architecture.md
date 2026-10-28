@@ -61,6 +61,15 @@
 - `UniqueID: com.notice.desktop`
 - 第二次启动会唤起并聚焦已有主窗口，不创建新实例。
 
+### 自动更新
+
+- `app.Updater.Init` 配置 GitHub Releases provider，默认仓库为 `ashu1800/Notice`。
+- 应用启动时静默检查一次；发现新版本才打开 Wails 内置更新窗口。
+- 托盘菜单和「设置 → 关于」提供手动检查入口。
+- Release 资产必须包含 `Notice-windows-amd64.exe` 和 `SHA256SUMS`；安装包作为附加资产。
+- 下载完成后先校验 SHA-256，再由 Wails updater helper 替换当前进程并重启。
+- `VERSION` 是版本单一来源；`scripts/release.ps1` 同步 `build/config.yml` 并创建 GitHub Release。
+
 ## 3. Wails 绑定边界
 
 `DesktopService` 暴露给前端的方法：
@@ -71,6 +80,7 @@
 | 账号 | `GetAccounts`、`SaveAccount`、`DeleteAccount` |
 | 通知 | `ShowNotificationWindow`、`ToastReady`、`ResizeToastWindow`、`HideToastWindow` |
 | 启动器 | `LauncherOpenMain`、`LauncherMinimize` |
+| 更新 | `GetAppVersion`、`CheckForUpdates` |
 | 系统 | `OpenExternal` |
 
 绑定文件由以下命令生成，不要手改：

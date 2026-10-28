@@ -9,6 +9,13 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+/**
+ * CheckForUpdates 打开 Wails 内置更新窗口，检查 GitHub Release 并按提示下载安装。
+ */
+export function CheckForUpdates(): $CancellablePromise<void> {
+    return $Call.ByID(897995752);
+}
+
 export function DeleteAccount(email: string): $CancellablePromise<void> {
     return $Call.ByID(1074221509, email);
 }
@@ -17,6 +24,10 @@ export function GetAccounts(): $CancellablePromise<$models.Account[]> {
     return $Call.ByID(2683325555).then(($result: any) => {
         return $$createType1($result);
     });
+}
+
+export function GetAppVersion(): $CancellablePromise<string> {
+    return $Call.ByID(3801962238);
 }
 
 export function GetCloseBehaviorSetting(): $CancellablePromise<$models.CloseBehaviorSetting> {

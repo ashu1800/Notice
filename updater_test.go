@@ -1,0 +1,19 @@
+package main
+
+import "testing"
+
+func TestAppVersionAndRepository(t *testing.T) {
+	if appVersion == "" {
+		t.Fatal("appVersion is empty")
+	}
+
+	t.Setenv("NOTICE_GITHUB_REPO", "")
+	if got := updateRepository(); got != defaultUpdateRepository {
+		t.Fatalf("default repository = %q, want %q", got, defaultUpdateRepository)
+	}
+
+	t.Setenv("NOTICE_GITHUB_REPO", "example/notice-test")
+	if got := updateRepository(); got != "example/notice-test" {
+		t.Fatalf("override repository = %q", got)
+	}
+}

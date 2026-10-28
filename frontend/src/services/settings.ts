@@ -1,4 +1,6 @@
 import {
+  CheckForUpdates,
+  GetAppVersion,
   GetCloseBehaviorSetting,
   GetLauncherSetting,
   GetLoginItemSettings,
@@ -10,6 +12,14 @@ import {
 } from '../../bindings/NoticeDesktop/desktopservice'
 
 export const settingsService = {
+  async getAppVersion() {
+    return GetAppVersion()
+  },
+
+  async checkForUpdates() {
+    return CheckForUpdates()
+  },
+
   async getLoginItemSettings() {
     return GetLoginItemSettings()
   },
