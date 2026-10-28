@@ -47,9 +47,9 @@
 .subscription-item {
   position: relative;
   display: grid;
-  grid-template-columns: 68px minmax(0, 1fr) auto;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
   align-items: stretch;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   border: 1px solid var(--line);
   border-radius: 2px 20px 2px 2px;
   background: var(--surface-raised);
@@ -87,25 +87,25 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 24px;
+  padding-top: 17px;
   border-right: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface) 55%, transparent);
   color: var(--ink-faint);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.08em;
 }
 
 .subscription-info {
   min-width: 0;
-  padding: 22px 26px 22px 24px;
+  padding: 14px 20px 14px 18px;
 }
 
 .subscription-meta {
   display: flex;
   align-items: center;
-  gap: 7px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 6px;
   color: var(--ink-faint);
   font-family: var(--font-mono);
   font-size: 9px;
@@ -128,18 +128,18 @@
 .subscription-title {
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: clamp(18px, 1.9vw, 23px);
   font-weight: 400;
   letter-spacing: -0.025em;
-  line-height: 1.05;
+  line-height: 1.1;
 }
 
 .subscription-token-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
-  margin-top: 16px;
+  margin-top: 9px;
 }
 
 .token-label {
@@ -172,13 +172,13 @@
 
 .subscription-token {
   min-width: 0;
-  padding: 4px 8px;
+  padding: 3px 6px;
   border: 1px solid var(--line);
   border-radius: 2px 6px 2px 2px;
   background: var(--code-bg);
   color: var(--ink-soft);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.04em;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -189,15 +189,17 @@
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  gap: 4px;
-  min-width: 92px;
-  padding: 18px 16px 18px 4px;
+  gap: 2px;
+  min-width: 84px;
+  padding: 10px 12px 10px 2px;
   border-left: 1px solid transparent;
 }
 
 .subscription-actions .icon-btn {
   justify-content: flex-start;
   width: 100%;
+  min-height: 30px;
+  padding-inline: 8px;
 }
 
 .copy-btn.is-copied {
@@ -235,8 +237,8 @@
 
 .subscription-skeleton {
   display: grid;
-  grid-template-columns: 68px 1fr;
-  min-height: 120px;
+  grid-template-columns: 56px 1fr;
+  min-height: 100px;
   border: 1px solid var(--line);
   border-radius: 2px 20px 2px 2px;
   background: var(--surface-raised);
@@ -345,7 +347,7 @@
 .subscription-empty h2 {
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: clamp(28px, 4vw, 42px);
+  font-size: clamp(24px, 3vw, 34px);
   font-weight: 400;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -405,7 +407,7 @@
   margin-top: 11px;
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: 40px;
+  font-size: 32px;
   font-weight: 400;
   letter-spacing: -0.035em;
   line-height: 0.95;
@@ -653,7 +655,7 @@
   }
 
   .subscription-empty h2 {
-    font-size: clamp(26px, 3.4vw, 36px);
+    font-size: clamp(22px, 2.8vw, 30px);
   }
 
   .subscription-empty .empty-copy {
@@ -677,15 +679,15 @@
   }
 
   .subscription-item {
-    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-columns: 44px minmax(0, 1fr);
   }
 
   .subscription-index {
-    padding-top: 21px;
+    padding-top: 16px;
   }
 
   .subscription-info {
-    padding: 18px;
+    padding: 13px 15px;
   }
 
   .subscription-actions {
@@ -693,7 +695,7 @@
     flex-direction: row;
     justify-content: flex-end;
     width: auto;
-    padding: 0 14px 16px;
+    padding: 0 14px 11px;
     border-left: 0;
   }
 
@@ -728,7 +730,7 @@
   }
 
   .modal-header h2 {
-    font-size: 34px;
+    font-size: 28px;
   }
 
   .subscription-empty {
