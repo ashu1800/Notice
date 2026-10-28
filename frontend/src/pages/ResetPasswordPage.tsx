@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '../services/auth'
+import { Icon } from '../components/Icon'
 import type { ResetPasswordRequest } from '../types'
 import './AuthPages.css'
 
@@ -107,25 +108,34 @@ export function ResetPasswordPage({ onSwitchToLogin }: ResetPasswordPageProps = 
   }
 
   return (
-    <div className="auth-page">
-      <div className="stars-layer"></div>
-      <div className="auth-container">
-        <h1 className="auth-title">找回密码</h1>
+    <div className="auth-form-page">
+      <div className="auth-form-inner">
+        <p className="eyebrow">ACCESS / RECOVER</p>
+        <h1 className="auth-form-title">找回密码</h1>
+        <p className="auth-form-subtitle">验证邮箱，重新拿到进入信号台的钥匙。</p>
+
+        <div className="auth-steps" aria-label="找回密码步骤">
+          <span className={step === 'email' ? 'active' : ''}>01 邮箱</span>
+          <span className={step === 'verify' ? 'active' : ''}>02 验证</span>
+          <span className={step === 'reset' ? 'active' : ''}>03 新密码</span>
+        </div>
 
         {step === 'email' && (
           <div className="auth-form">
             <div className="input-group">
-              <label>邮箱</label>
+              <label htmlFor="reset-email">邮箱</label>
               <input
+                id="reset-email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="请输入注册邮箱"
+                placeholder="name@domain.com"
+                autoComplete="email"
                 required
               />
             </div>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="error-message" role="alert">{error}</div>}
 
             <button
               type="button"
@@ -133,7 +143,8 @@ export function ResetPasswordPage({ onSwitchToLogin }: ResetPasswordPageProps = 
               onClick={handleSendCode}
               disabled={sendingCode}
             >
-              {sendingCode ? '发送中...' : '发送验证码'}
+              <span>{sendingCode ? '发送中...' : '发送验证码'}</span>
+              {!sendingCode && <Icon name="arrow-right" size={16} />}
             </button>
           </div>
         )}
@@ -141,7 +152,7 @@ export function ResetPasswordPage({ onSwitchToLogin }: ResetPasswordPageProps = 
         {step === 'verify' && (
           <div className="auth-form">
             <div className="code-hint">
-              验证码已发送至 {email}
+              <span>验证码已发送至 <b>{email}</b></span>
               <button type="button" onClick={() => {
                 clearCountdown()
                 setCountdown(0)
@@ -150,13 +161,16 @@ export function ResetPasswordPage({ onSwitchToLogin }: ResetPasswordPageProps = 
             </div>
 
             <div className="input-group">
-              <label>验证码</label>
+              <label htmlFor="reset-code">验证码</label>
               <input
+                id="reset-code"
                 type="text"
                 value={code}
                 onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="请输入6位验证码"
+                placeholder="6 位数字验证码"
                 maxLength={6}
+                inputMode="numeric"
+                autoComplete="one-time-code"
                 required
               />
             </div>
@@ -167,13 +181,14 @@ export function ResetPasswordPage({ onSwitchToLogin }: ResetPasswordPageProps = 
               onClick={handleSendCode}
               disabled={sendingCode || countdown > 0}
             >
-              {sendingCode ? '发送中...' : countdown > 0 ? `${countdown}s后重发` : '重新发送'}
+              {sendingCode ? '发送中...' : countdown > 0 ? `${countdown}s 后重发` : '重新发送验证码'}
             </button>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="error-message" role="alert">{error}</div>}
 
             <button type="button" className="auth-button" onClick={handleVerifyCode}>
-              下一步
+              <span>下一步</span>
+              <Icon name="arrow-right" size={16} />
             </button>
           </div>
         )}
@@ -181,31 +196,36 @@ export function ResetPasswordPage({ onSwitchToLogin }: ResetPasswordPageProps = 
         {step === 'reset' && (
           <form onSubmit={handleReset} className="auth-form">
             <div className="input-group">
-              <label>新密码</label>
+              <label htmlFor="reset-new-password">新密码</label>
               <input
+                id="reset-new-password"
                 type="password"
                 value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
-                placeholder="请输入新密码（至少6位）"
+                placeholder="至少 6 位字符"
+                autoComplete="new-password"
                 required
               />
             </div>
 
             <div className="input-group">
-              <label>确认新密码</label>
+              <label htmlFor="reset-confirm-password">确认新密码</label>
               <input
+                id="reset-confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
-                placeholder="请再次输入新密码"
+                placeholder="再次输入新密码"
+                autoComplete="new-password"
                 required
               />
             </div>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="error-message" role="alert">{error}</div>}
 
             <button type="submit" className="auth-button" disabled={loading}>
-              {loading ? '重置中...' : '完成重置'}
+              <span>{loading ? '重置中...' : '完成重置'}</span>
+              {!loading && <Icon name="arrow-right" size={16} />}
             </button>
           </form>
         )}

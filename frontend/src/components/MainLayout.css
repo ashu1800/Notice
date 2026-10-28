@@ -1,19 +1,59 @@
 .main-layout {
-  width: 100%;
-  height: 100vh;
+  position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
+  width: 100%;
+  height: 100vh;
+  background:
+    radial-gradient(ellipse 58% 45% at 100% 0%, var(--accent-soft), transparent 68%),
+    radial-gradient(ellipse 42% 42% at 0% 100%, var(--live-soft), transparent 70%),
+    var(--paper);
+}
+
+.main-layout::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  content: "";
+  pointer-events: none;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.6), transparent 64%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.6), transparent 64%);
 }
 
 .main-content {
-  flex: 1;
+  position: relative;
+  z-index: 1;
   display: flex;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
 .main-area {
+  position: relative;
   flex: 1;
+  min-width: 0;
+  padding: clamp(28px, 4.4vw, 64px) clamp(28px, 5vw, 72px);
   overflow-y: auto;
-  padding: 24px;
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 860px) {
+  .main-area {
+    padding: 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .main-area {
+    padding: 22px 18px 30px;
+  }
 }

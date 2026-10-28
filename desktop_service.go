@@ -71,7 +71,7 @@ func (s *DesktopService) createMainWindow() {
 		Hidden:           true,
 		URL:              "/",
 		InitialPosition:  application.WindowCentered,
-		BackgroundColour: application.NewRGB(26, 26, 26),
+		BackgroundColour: application.NewRGB(233, 236, 230),
 		Windows: application.WindowsWindow{
 			DisableFramelessWindowDecorations: false,
 		},
@@ -150,7 +150,7 @@ func (s *DesktopService) showLauncher() {
 		DisableResize:    true,
 		URL:              "/launcher.html",
 		InitialPosition:  application.WindowCentered,
-		BackgroundColour: application.NewRGB(26, 26, 26),
+		BackgroundColour: application.NewRGB(13, 20, 17),
 		Windows: application.WindowsWindow{
 			DisableFramelessWindowDecorations: true,
 		},

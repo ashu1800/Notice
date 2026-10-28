@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { authService } from '../services/auth'
 import { storageService } from '../services/storage'
+import { Icon } from '../components/Icon'
 import type { LoginRequest } from '../types'
-import './LoginPage.css'
+import './AuthPages.css'
 
 interface LoginPageProps {
   onSwitchToRegister?: () => void
@@ -91,21 +92,23 @@ export function LoginPage({ onSwitchToRegister, onSwitchToReset }: LoginPageProp
   }
 
   return (
-    <div className="login-page">
-      <div className="stars-layer"></div>
-      <div className="login-container">
-        <h1 className="login-title">Notice</h1>
-        <p className="login-subtitle">消息订阅桌面客户端</p>
+    <div className="auth-form-page">
+      <div className="auth-form-inner">
+        <p className="eyebrow">ACCESS / SIGN IN</p>
+        <h1 className="auth-form-title">登录</h1>
+        <p className="auth-form-subtitle">回到你的信号台。</p>
 
-        <form onSubmit={handleSubmit} className="login-form">
+        <form onSubmit={handleSubmit} className="auth-form">
           <div className="input-group">
-            <label>邮箱</label>
+            <label htmlFor="login-email">邮箱</label>
             <div className="input-wrapper">
               <input
+                id="login-email"
                 type="email"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                placeholder="请输入邮箱"
+                placeholder="name@domain.com"
+                autoComplete="username"
                 required
               />
               {savedAccounts.length > 0 && (
@@ -113,8 +116,10 @@ export function LoginPage({ onSwitchToRegister, onSwitchToReset }: LoginPageProp
                   type="button"
                   className="account-toggle"
                   onClick={() => setShowAccountList(!showAccountList)}
+                  aria-label="选择已保存账号"
+                  aria-expanded={showAccountList}
                 >
-                  ▼
+                  <Icon name="chevron-down" size={14} />
                 </button>
               )}
               {showAccountList && (
@@ -124,14 +129,23 @@ export function LoginPage({ onSwitchToRegister, onSwitchToReset }: LoginPageProp
                       key={account.email}
                       className="account-item"
                       onClick={() => handleSelectAccount(account)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={event => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          handleSelectAccount(account)
+                        }
+                      }}
                     >
                       <span className="account-email">{account.email}</span>
                       <button
                         type="button"
                         className="account-delete"
                         onClick={e => handleDeleteAccount(e, account.email)}
+                        aria-label={`删除 ${account.email}`}
                       >
-                        ×
+                        <Icon name="close" size={11} />
                       </button>
                     </div>
                   ))}
@@ -141,17 +155,19 @@ export function LoginPage({ onSwitchToRegister, onSwitchToReset }: LoginPageProp
           </div>
 
           <div className="input-group">
-            <label>密码</label>
+            <label htmlFor="login-password">密码</label>
             <input
+              id="login-password"
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="请输入密码"
+              placeholder="输入密码"
+              autoComplete="current-password"
               required
             />
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className="error-message" role="alert">{error}</div>}
 
           <div className="form-options">
             <label className="remember-password">
@@ -160,19 +176,20 @@ export function LoginPage({ onSwitchToRegister, onSwitchToReset }: LoginPageProp
                 checked={rememberPassword}
                 onChange={e => setRememberPassword(e.target.checked)}
               />
-              记住密码
+              <span>记住密码</span>
             </label>
             <button type="button" className="forgot-password" onClick={() => onSwitchToReset?.() || navigate('/reset')}>
               忘记密码？
             </button>
           </div>
 
-          <button type="submit" className="login-button" disabled={loading}>
-            {loading ? '登录中...' : '登录'}
+          <button type="submit" className="auth-button login-button" disabled={loading}>
+            <span>{loading ? '登录中...' : '登录'}</span>
+            {!loading && <Icon name="arrow-right" size={16} />}
           </button>
         </form>
 
-        <p className="register-link">
+        <p className="auth-link">
           还没有账号？<button type="button" onClick={() => onSwitchToRegister?.() || navigate('/register')}>立即注册</button>
         </p>
       </div>

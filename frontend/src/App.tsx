@@ -25,7 +25,33 @@ function AuthLayout() {
     <div className="auth-shell">
       <TitleBar />
       <div className="auth-content">
-        <Outlet />
+        <section className="auth-brand" aria-label="Notice Signal Desk">
+          <div className="auth-brand-top">
+            <span className="auth-brand-signal" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
+            <span>PRIVATE SIGNAL DESK / 001</span>
+          </div>
+          <div className="auth-brand-center">
+            <p className="auth-brand-kicker">EVERY NOTICE / A QUIET ARRIVAL</p>
+            <h1 className="auth-wordmark">Notice<span>.</span></h1>
+            <p className="auth-brand-tagline">把重要的事，安静地送达。</p>
+          </div>
+          <div className="auth-brand-bottom">
+            <div className="auth-wave" aria-hidden="true">
+              {[8, 18, 12, 28, 16, 34, 22, 14, 26, 10, 20, 7].map((height, index) => (
+                <i key={index} style={{ height: `${height}px`, animationDelay: `${index * 90}ms` }} />
+              ))}
+            </div>
+            <span>DESKTOP CLIENT / 2026</span>
+          </div>
+        </section>
+        <section className="auth-panel">
+          <Outlet />
+        </section>
       </div>
     </div>
   )

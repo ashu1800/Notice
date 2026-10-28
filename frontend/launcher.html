@@ -10,51 +10,199 @@
         padding: 0;
         box-sizing: border-box;
       }
+
+      :root {
+        --ink: #0d1411;
+        --paper: #e9ece6;
+        --accent: #f04a22;
+        --live: #7de5ac;
+        --muted: rgba(233, 236, 230, 0.5);
+        --line: rgba(233, 236, 230, 0.16);
+        --display: "Bahnschrift SemiCondensed", "Bahnschrift", "Segoe UI Variable Display", sans-serif;
+        --body: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+        --mono: "Cascadia Mono", "Cascadia Code", "Consolas", monospace;
+      }
+
+      html,
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 100%;
+        height: 100%;
       }
-      .launcher {
-        text-align: center;
-        color: white;
-      }
-      .launcher h1 {
-        font-size: 36px;
-        margin-bottom: 40px;
-      }
-      .launcher-buttons {
+
+      body {
+        position: relative;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        justify-content: space-between;
+        padding: 26px 27px 24px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 85% 6%, rgba(240, 74, 34, 0.2), transparent 38%),
+          radial-gradient(circle at 5% 110%, rgba(125, 229, 172, 0.1), transparent 35%),
+          var(--ink);
+        color: var(--paper);
+        font-family: var(--body);
+        -webkit-font-smoothing: antialiased;
+        --wails-draggable: drag;
       }
+
+      body::before {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 236, 230, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(233, 236, 230, 0.045) 1px, transparent 1px);
+        background-size: 42px 42px;
+        content: "";
+        pointer-events: none;
+        mask-image: linear-gradient(140deg, rgba(0, 0, 0, 0.7), transparent 78%);
+        -webkit-mask-image: linear-gradient(140deg, rgba(0, 0, 0, 0.7), transparent 78%);
+      }
+
+      body::after {
+        position: absolute;
+        top: -155px;
+        right: -165px;
+        width: 330px;
+        height: 330px;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        box-shadow:
+          0 0 0 42px rgba(233, 236, 230, 0.025),
+          0 0 0 84px rgba(233, 236, 230, 0.015);
+        content: "";
+        pointer-events: none;
+      }
+
+      .launcher {
+        position: relative;
+        z-index: 1;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 25px;
+      }
+
+      .brand-mark {
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 16px;
+      }
+
+      .brand-mark i {
+        width: 2px;
+        background: var(--accent);
+      }
+
+      .brand-mark i:nth-child(1) { height: 6px; opacity: 0.5; }
+      .brand-mark i:nth-child(2) { height: 10px; opacity: 0.72; }
+      .brand-mark i:nth-child(3) { height: 16px; }
+      .brand-mark i:nth-child(4) { height: 9px; opacity: 0.45; }
+
+      .brand-label {
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 8px;
+        letter-spacing: 0.14em;
+      }
+
+      h1 {
+        color: var(--paper);
+        font-family: var(--display);
+        font-size: 61px;
+        font-weight: 300;
+        letter-spacing: -0.055em;
+        line-height: 0.76;
+      }
+
+      h1 span {
+        color: var(--accent);
+      }
+
+      .tagline {
+        margin-top: 16px;
+        color: var(--muted);
+        font-size: 11px;
+        letter-spacing: 0.02em;
+      }
+
+      .actions {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        gap: 8px;
+        margin-top: 21px;
+      }
+
       .launcher-btn {
-        padding: 14px 40px;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px;
+        display: flex;
+        flex: 1;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 39px;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 2px 9px 2px 2px;
+        background: transparent;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 0.04em;
         cursor: pointer;
-        transition: all 0.2s;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        backdrop-filter: blur(10px);
+        --wails-draggable: no-drag;
+        transition:
+          color 160ms ease,
+          background-color 160ms ease,
+          border-color 160ms ease,
+          transform 200ms var(--ease-out, ease-out);
       }
+
       .launcher-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: scale(1.02);
+        border-color: var(--line);
+        background: rgba(233, 236, 230, 0.07);
+        color: var(--paper);
+        transform: translateY(-1px);
+      }
+
+      .launcher-btn.primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #1a0e09;
+      }
+
+      .launcher-btn.primary:hover {
+        border-color: #ff6a47;
+        background: #ff6a47;
+      }
+
+      .launcher-btn .arrow {
+        font-family: var(--body);
+        font-size: 14px;
+        line-height: 1;
       }
     </style>
   </head>
   <body>
     <div class="launcher">
-      <h1>Notice</h1>
-      <div class="launcher-buttons">
-        <button class="launcher-btn" id="open-main">打开主窗口</button>
-        <button class="launcher-btn" id="minimize-to-tray">最小化到托盘</button>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-label">PRIVATE SIGNAL DESK / 001</span>
       </div>
+      <h1>Notice<span>.</span></h1>
+      <p class="tagline">把重要的事，安静地送达。</p>
+    </div>
+    <div class="actions">
+      <button class="launcher-btn" id="minimize-to-tray">
+        最小化到托盘
+      </button>
+      <button class="launcher-btn primary" id="open-main">
+        打开主窗口
+        <span class="arrow" aria-hidden="true">↗</span>
+      </button>
     </div>
     <script type="module" src="/src/launcher/launcher.ts"></script>
   </body>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '../services/auth'
+import { Icon } from '../components/Icon'
 import type { RegisterRequest } from '../types'
 import './AuthPages.css'
 
@@ -99,43 +100,55 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps = {}) {
   }
 
   return (
-    <div className="auth-page">
-      <div className="stars-layer"></div>
-      <div className="auth-container">
-        <h1 className="auth-title">注册</h1>
+    <div className="auth-form-page">
+      <div className="auth-form-inner">
+        <p className="eyebrow">ACCESS / REGISTER</p>
+        <h1 className="auth-form-title">注册</h1>
+        <p className="auth-form-subtitle">建立你的第一条信号通道。</p>
+
+        <div className="auth-steps" aria-label="注册步骤">
+          <span className={step === 'email' ? 'active' : ''}>01 账号信息</span>
+          <span className={step === 'verify' ? 'active' : ''}>02 验证邮箱</span>
+        </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
           {step === 'email' ? (
             <>
               <div className="input-group">
-                <label>邮箱</label>
+                <label htmlFor="register-email">邮箱</label>
                 <input
+                  id="register-email"
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder="请输入邮箱"
+                  placeholder="name@domain.com"
+                  autoComplete="email"
                   required
                 />
               </div>
 
               <div className="input-group">
-                <label>密码</label>
+                <label htmlFor="register-password">密码</label>
                 <input
+                  id="register-password"
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="请输入密码（至少6位）"
+                  placeholder="至少 6 位字符"
+                  autoComplete="new-password"
                   required
                 />
               </div>
 
               <div className="input-group">
-                <label>确认密码</label>
+                <label htmlFor="register-confirm">确认密码</label>
                 <input
+                  id="register-confirm"
                   type="password"
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  placeholder="请再次输入密码"
+                  placeholder="再次输入密码"
+                  autoComplete="new-password"
                   required
                 />
               </div>
@@ -143,7 +156,7 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps = {}) {
           ) : (
             <>
               <div className="code-hint">
-                验证码已发送至 {email}
+                <span>验证码已发送至 <b>{email}</b></span>
                 <button type="button" onClick={() => {
                   clearCountdown()
                   setCountdown(0)
@@ -152,13 +165,16 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps = {}) {
               </div>
 
               <div className="input-group">
-                <label>验证码</label>
+                <label htmlFor="register-code">验证码</label>
                 <input
+                  id="register-code"
                   type="text"
                   value={code}
                   onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="请输入6位验证码"
+                  placeholder="6 位数字验证码"
                   maxLength={6}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
                   required
                 />
               </div>
@@ -169,12 +185,12 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps = {}) {
                 onClick={handleSendCode}
                 disabled={sendingCode || countdown > 0}
               >
-                {sendingCode ? '发送中...' : countdown > 0 ? `${countdown}s后重发` : '重新发送'}
+                {sendingCode ? '发送中...' : countdown > 0 ? `${countdown}s 后重发` : '重新发送验证码'}
               </button>
             </>
           )}
 
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className="error-message" role="alert">{error}</div>}
 
           {step === 'email' ? (
             <button
@@ -183,11 +199,13 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps = {}) {
               onClick={handleSendCode}
               disabled={sendingCode}
             >
-              {sendingCode ? '发送中...' : '下一步'}
+              <span>{sendingCode ? '发送中...' : '下一步'}</span>
+              {!sendingCode && <Icon name="arrow-right" size={16} />}
             </button>
           ) : (
             <button type="submit" className="auth-button" disabled={loading}>
-              {loading ? '注册中...' : '完成注册'}
+              <span>{loading ? '注册中...' : '完成注册'}</span>
+              {!loading && <Icon name="arrow-right" size={16} />}
             </button>
           )}
         </form>

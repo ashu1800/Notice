@@ -1,13 +1,23 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useWS } from '../contexts/WSContext'
+import { Icon, type IconName } from './Icon'
 import './Sidebar.css'
 
-const navItems = [
-  { path: '/', label: '消息', icon: '📬' },
-  { path: '/subscriptions', label: '订阅', icon: '📋' },
-  { path: '/settings', label: '设置', icon: '⚙️' }
+interface NavItem {
+  path: string
+  label: string
+  caption: string
+  icon: IconName
+}
+
+const navItems: NavItem[] = [
+  { path: '/', label: '消息', caption: 'INBOX', icon: 'inbox' },
+  { path: '/subscriptions', label: '订阅', caption: 'FEEDS', icon: 'feed' },
+  { path: '/settings', label: '设置', caption: 'SYSTEM', icon: 'settings' }
 ]
+
+const waveform = [4, 9, 6, 14, 8, 18, 11, 16, 7, 12, 5, 9]
 
 export function Sidebar() {
   const { logout, user } = useAuth()
@@ -19,40 +29,82 @@ export function Sidebar() {
     navigate('/login')
   }
 
+  const initial = user?.email?.charAt(0).toUpperCase() || 'N'
+
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">
-        <h1 className="sidebar-logo">Notice</h1>
-      </div>
-      <nav className="sidebar-nav">
+      <header className="sidebar-header">
+        <div className="brand-lockup">
+          <span className="brand-glyph" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+          </span>
+          <div className="brand-copy">
+            <span className="brand-word">Notice</span>
+            <span className="brand-caption">PRIVATE SIGNAL DESK</span>
+          </div>
+        </div>
+      </header>
+
+      <nav className="sidebar-nav" aria-label="主导航">
         {navItems.map(item => (
           <NavLink
             key={item.path}
             to={item.path}
+            end={item.path === '/'}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
-            <span className="nav-icon">{item.icon}</span>
-            <span className="nav-label">{item.label}</span>
+            <span className="nav-icon">
+              <Icon name={item.icon} size={18} />
+            </span>
+            <span className="nav-copy">
+              <span className="nav-label">{item.label}</span>
+              <span className="nav-caption">{item.caption}</span>
+            </span>
+            <Icon name="arrow-up-right" size={13} className="nav-arrow" />
           </NavLink>
         ))}
       </nav>
-      <div className="sidebar-footer">
-        <div className="user-info">
-          <span className="user-avatar">👤</span>
-          <div className="user-meta">
-            {user && (
-              <span className="user-email">{user.email}</span>
-            )}
-            <span className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
-              {isConnected ? '已连接' : '连接断开'}
-            </span>
-          </div>
+
+      <div className="sidebar-live" aria-label={isConnected ? '实时连接正常' : '实时连接断开'}>
+        <div className="live-line">
+          <span className={`live-dot ${isConnected ? 'is-live' : ''}`} />
+          <span className="live-label">{isConnected ? 'LIVE' : 'OFFLINE'}</span>
+          <span className="live-code">WS/01</span>
         </div>
-        <button className="logout-btn" onClick={handleLogout}>
-          <span className="nav-icon">🚪</span>
-          <span className="nav-label">退出登录</span>
-        </button>
+        <div className="waveform" aria-hidden="true">
+          {waveform.map((height, index) => (
+            <i
+              key={index}
+              style={{
+                height: `${height}px`,
+                animationDelay: `${index * 90}ms`
+              }}
+            />
+          ))}
+        </div>
       </div>
+
+      <footer className="sidebar-footer">
+        <div className="user-card">
+          <span className="user-avatar" aria-hidden="true">{initial}</span>
+          <div className="user-meta">
+            <span className="user-kicker">SIGNED IN</span>
+            <span className="user-email" title={user?.email || ''}>{user?.email || '未登录'}</span>
+          </div>
+          <button
+            type="button"
+            className="logout-btn"
+            onClick={handleLogout}
+            aria-label="退出登录"
+            title="退出登录"
+          >
+            <Icon name="logout" size={16} />
+          </button>
+        </div>
+      </footer>
     </aside>
   )
 }

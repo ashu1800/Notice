@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useWS } from '../contexts/WSContext'
 import { messageService } from '../services/message'
 import { subscribeService } from '../services/subscribe'
 import { MessageCard } from '../components/MessageCard'
+import { Icon } from '../components/Icon'
 import type { Message } from '../types'
 import {
   mergeIncomingMessage,
@@ -15,7 +17,7 @@ import './HomePage.css'
 
 export function HomePage() {
   const { token } = useAuth()
-  const { onMessage } = useWS()
+  const { onMessage, isConnected } = useWS()
   const [messages, setMessages] = useState<MessageWithTitle[]>([])
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
@@ -23,6 +25,7 @@ export function HomePage() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [hasSubscriptions, setHasSubscriptions] = useState(true)
   const [subscriptionsChecked, setSubscriptionsChecked] = useState(false)
+  const [subscriptionTitles, setSubscriptionTitles] = useState<Record<string, string>>({})
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const messageListRef = useRef<HTMLDivElement>(null)
@@ -49,6 +52,7 @@ export function HomePage() {
         const hasSubs = subscriptions && subscriptions.length > 0
         setHasSubscriptions(hasSubs)
         setSubscriptionsChecked(true)
+        setSubscriptionTitles(Object.fromEntries(subscriptions.map(sub => [sub.token, sub.title])))
 
         // 如果没有订阅，清空消息列表并阻止加载
         if (!hasSubs) {
@@ -114,8 +118,6 @@ export function HomePage() {
   // 监听 WebSocket 推送，将新消息插入列表顶部（去重）
   useEffect(() => {
     const unsubscribe = onMessage((msg: Message) => {
-      console.log('[HomePage] 收到 WebSocket 推送:', msg)
-
       setMessages(prev => mergeIncomingMessage(prev, msg))
     })
 
@@ -160,39 +162,119 @@ export function HomePage() {
     return () => {
       observerRef.current?.disconnect()
     }
-  }, [hasMore, loading, hasSubscriptions])
+  }, [hasMore, loading, hasSubscriptions, messages.length])
 
   const handleRefresh = () => {
     setIsRefreshing(true)
     setPage(1)
-    loadMessages(1, true)
+    void loadMessages(1, true)
   }
 
+  const showInitialLoading = loading && messages.length === 0
+
   return (
-    <div className="home-page">
-      <div className="home-header">
-        <h2>消息列表</h2>
-        <button className="refresh-btn" onClick={handleRefresh} disabled={isRefreshing}>
-          {isRefreshing ? '刷新中...' : '刷新'}
-        </button>
-      </div>
+    <div className="page-shell home-page">
+      <header className="page-header">
+        <div className="page-heading">
+          <p className="eyebrow">
+            {isConnected ? 'LIVE INBOX' : 'INBOX / SYNCING'}
+          </p>
+          <h1 className="page-title">消息</h1>
+          <p className="page-lede">
+            每一则推送都是一次抵达。向下滚动，可以继续翻阅更早的信号。
+          </p>
+        </div>
+        <div className="page-header-side">
+          <span className="message-count" aria-label={`已加载 ${messages.length} 条消息`}>
+            {String(messages.length).padStart(2, '0')} <small>LOADED</small>
+          </span>
+          <button
+            type="button"
+            className="btn btn-ghost refresh-btn"
+            onClick={handleRefresh}
+            disabled={isRefreshing || !hasSubscriptions}
+          >
+            <Icon name="refresh" size={15} className={isRefreshing ? 'spin' : undefined} />
+            {isRefreshing ? '同步中' : '刷新'}
+          </button>
+        </div>
+      </header>
 
       <div ref={messageListRef} className="message-list">
+        {showInitialLoading && (
+          <div className="message-skeletons" aria-label="正在加载消息">
+            {[0, 1, 2].map(item => (
+              <div className="message-skeleton" key={item}>
+                <span />
+                <div>
+                  <i />
+                  <b />
+                  <b />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {messages.map((msg, index) => (
-          <MessageCard key={msg.id || `msg-${index}`} message={msg} />
+          <MessageCard
+            key={msg.id || `msg-${index}`}
+            message={msg}
+            sourceTitle={subscriptionTitles[msg.token]}
+            index={index}
+          />
         ))}
 
-        <div ref={loadMoreRef} className="load-more">
-          {loading && <div className="loading-spinner">加载中...</div>}
-          {!hasMore && messages.length > 0 && <div className="no-more">没有更多消息了</div>}
-        </div>
+        {(messages.length > 0 || loading) && (
+          <div ref={loadMoreRef} className="load-more" aria-live="polite">
+            {loading && messages.length > 0 && (
+              <span className="loading-line">
+                <i />
+                <i />
+                <i />
+                正在接收
+              </span>
+            )}
+            {!hasMore && messages.length > 0 && (
+              <span className="no-more">
+                <span className="no-more-line" />
+                已经到底了
+                <span className="no-more-line" />
+              </span>
+            )}
+          </div>
+        )}
 
         {messages.length === 0 && !loading && subscriptionsChecked && (
           <div className="empty-state">
-            <p>{hasSubscriptions ? '暂无消息' : '您还没有订阅任何通知，请先添加订阅'}</p>
+            <div className={`empty-signal ${hasSubscriptions ? '' : 'is-idle'}`} aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+            </div>
+            <p className="empty-kicker">{hasSubscriptions ? 'NO SIGNALS YET' : 'NO FEEDS CONNECTED'}</p>
+            <h2>{hasSubscriptions ? '这里还很安静' : '先接上一路信号'}</h2>
+            <p className="empty-copy">
+              {hasSubscriptions
+                ? '订阅已经在工作。当有新的消息抵达，它会出现在这里。'
+                : '添加一个订阅，或者创建一个新的 Token，开始接收消息。'}
+            </p>
+            {!hasSubscriptions && (
+              <Link to="/subscriptions" className="btn btn-primary empty-action">
+                管理订阅
+                <Icon name="arrow-right" size={15} />
+              </Link>
+            )}
           </div>
         )}
       </div>
+
+      <footer className="home-foot" aria-label="消息流状态">
+        <span>REALTIME STREAM / WS</span>
+        <span>{isConnected ? 'CONNECTED AND LISTENING' : 'RECONNECTING'}</span>
+      </footer>
     </div>
   )
 }

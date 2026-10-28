@@ -1,146 +1,361 @@
 .settings-page {
-  max-width: 800px;
+  height: 100%;
+  min-height: 0;
 }
 
-.settings-page h2 {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 32px;
+.settings-version {
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.settings-version b {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.settings-body {
+  max-width: 980px;
+  margin-top: 30px;
 }
 
 .settings-section {
-  margin-bottom: 32px;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 30px;
+  padding: 0 0 30px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--line);
 }
 
-.settings-section h3 {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.settings-section:last-child {
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+.settings-heading {
+  padding-top: 4px;
+}
+
+.settings-heading .eyebrow {
+  font-size: 9px;
+}
+
+.settings-heading .eyebrow::before {
+  width: 12px;
+}
+
+.settings-heading h2 {
+  margin-top: 11px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.settings-panel {
+  border: 1px solid var(--line);
+  border-radius: 2px 16px 2px 2px;
+  background: var(--surface-raised);
+  overflow: hidden;
 }
 
 .setting-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 74px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+  transition: background-color 160ms ease;
+}
+
+.setting-item:last-child {
+  border-bottom: 0;
+}
+
+.setting-item:hover {
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+}
+
+.setting-item-stack {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .setting-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .setting-label {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-primary);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .setting-desc {
-  font-size: 13px;
-  color: var(--text-tertiary);
+  color: var(--ink-faint);
+  font-size: 11px;
+  line-height: 1.55;
 }
 
 .theme-options {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 2px 10px 2px 2px;
+  background: var(--surface);
 }
 
 .theme-btn {
-  padding: 8px 16px;
-  background: var(--hover-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 1px 6px 1px 1px;
+  background: transparent;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
 }
 
 .theme-btn:hover {
-  border-color: var(--primary-color);
+  color: var(--ink-soft);
 }
 
 .theme-btn.active {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
+  border-color: var(--line);
+  background: var(--surface-raised);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(17, 24, 22, 0.06);
 }
 
 .toggle-switch {
   position: relative;
-  width: 52px;
-  height: 28px;
+  flex: 0 0 42px;
+  display: block;
+  width: 42px;
+  height: 24px;
 }
 
 .toggle-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   opacity: 0;
-  width: 0;
-  height: 0;
 }
 
 .toggle-slider {
   position: absolute;
+  inset: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  background: transparent;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--toggle-bg);
-  border-radius: 28px;
-  transition: all 0.3s;
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease;
 }
 
 .toggle-slider::before {
   position: absolute;
-  content: '';
-  height: 22px;
-  width: 22px;
-  left: 3px;
   bottom: 3px;
-  background: white;
+  left: 3px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  transition: all 0.3s;
+  background: var(--ink-faint);
+  content: "";
+  transition:
+    transform 260ms var(--ease-spring),
+    background-color 220ms ease;
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background: var(--primary-color);
+  border-color: var(--accent);
+  background: var(--accent);
 }
 
 .toggle-switch input:checked + .toggle-slider::before {
-  transform: translateX(24px);
+  background: var(--accent-contrast);
+  transform: translateX(18px);
 }
 
-/* 设置页面滚动条样式 */
-.settings-page::-webkit-scrollbar {
-  width: 8px;
+.toggle-switch input:focus-visible + .toggle-slider {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
-.settings-page::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-  border-radius: 4px;
+.toggle-switch input:disabled + .toggle-slider {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
-.settings-page::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-  transition: background 0.2s;
+.duration-input {
+  width: 76px;
+  padding: 7px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--line-strong);
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-align: center;
+  transition: border-color 160ms ease;
 }
 
-.settings-page::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
+.duration-input:focus {
+  border-bottom-color: var(--accent);
 }
 
-/* Firefox 滚动条样式 */
-.settings-page {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-color) var(--bg-primary);
+.about-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+}
+
+.about-mark {
+  display: flex;
+  flex: 0 0 38px;
+  align-items: flex-end;
+  gap: 3px;
+  height: 38px;
+  padding-bottom: 2px;
+}
+
+.about-mark i {
+  width: 4px;
+  border-radius: 1px;
+  background: var(--accent);
+}
+
+.about-mark i:nth-child(1) {
+  height: 10px;
+  opacity: 0.45;
+}
+
+.about-mark i:nth-child(2) {
+  height: 19px;
+  opacity: 0.7;
+}
+
+.about-mark i:nth-child(3) {
+  height: 30px;
+}
+
+.about-mark i:nth-child(4) {
+  height: 15px;
+  opacity: 0.55;
+}
+
+.about-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.about-name {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.about-meta {
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.09em;
+}
+
+.update-btn {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1000px) {
+  .settings-section {
+    grid-template-columns: 116px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .settings-heading h2 {
+    font-size: 23px;
+  }
+}
+
+@media (max-width: 720px) {
+  .settings-section {
+    display: block;
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+  }
+
+  .settings-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .settings-heading h2 {
+    margin-top: 0;
+    font-size: 22px;
+  }
+
+  .setting-item {
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .setting-item:not(.setting-item-stack) {
+    gap: 14px;
+  }
+
+  .theme-options {
+    width: 100%;
+  }
+
+  .theme-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .about-panel {
+    flex-wrap: wrap;
+  }
+
+  .update-btn {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .settings-version {
+    display: none;
+  }
 }

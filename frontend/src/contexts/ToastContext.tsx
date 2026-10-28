@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useRef, useEffect, memo } from 'react'
 import { GetNotificationSettings, ShowNotificationWindow } from '../../bindings/NoticeDesktop/desktopservice'
+import { Icon } from '../components/Icon'
 
 interface ToastMessage {
   id: number
@@ -194,12 +195,12 @@ const ToastItem = memo(function ToastItem({
 
   return (
     <div className={`toast-item ${toast.state === 'exiting' ? 'exiting' : ''}`}>
-      <div className="toast-icon">📬</div>
+      <div className="toast-icon"><Icon name="inbox" size={17} /></div>
       <div className="toast-content">
         <div className="toast-title">{toast.title}</div>
         {toast.content && <div className="toast-body">{toast.content}</div>}
       </div>
-      <button className="toast-close" onClick={handleClose}>×</button>
+      <button type="button" className="toast-close" onClick={handleClose} aria-label="关闭通知">×</button>
     </div>
   )
 })
