@@ -29,11 +29,13 @@ import (
 	"Notice/utils/responses"
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/gomail.v2"
+	"gorm.io/gorm"
 )
 
 // RegisterRequest 注册请求参数
@@ -197,6 +199,55 @@ func AddSubscribe(c *gin.Context) {
 	responses.SuccessWithMessage(c, "订阅成功", nil)
 }
 
+type CreateSubscribeWithTokenRequest struct {
+	Title string `json:"title"`
+}
+
+// CreateSubscribeWithToken 在同一个事务里创建 Token 和订阅，避免产生无主 Token。
+func CreateSubscribeWithToken(c *gin.Context) {
+	var req CreateSubscribeWithTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		responses.BadRequest(c, "Invalid request parameters: "+err.Error())
+		return
+	}
+	title := strings.TrimSpace(req.Title)
+	if title == "" {
+		responses.BadRequest(c, "订阅标题不能为空")
+		return
+	}
+
+	userID, exists := c.Get("userID")
+	if !exists {
+		responses.Unauthorized(c, "用户未认证")
+		return
+	}
+	uid, ok := userID.(uint)
+	if !ok || uid == 0 {
+		responses.Unauthorized(c, "用户未认证")
+		return
+	}
+
+	tokenValue, err := base.GenerateRandomString(24)
+	if err != nil {
+		responses.InternalServerError(c, "生成订阅Token失败")
+		return
+	}
+
+	token := models.SubscribeToken{Token: tokenValue, Remark: title}
+	subscription := models.Subscribe{UserID: uid, Token: tokenValue, Title: title}
+	if err := database.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&token).Error; err != nil {
+			return err
+		}
+		return tx.Create(&subscription).Error
+	}); err != nil {
+		responses.InternalServerError(c, "创建订阅失败")
+		return
+	}
+
+	responses.SuccessWithMessage(c, "订阅创建成功", gin.H{"token": tokenValue})
+}
+
 // DeleteSubscribe TODO: 取消订阅
 func DeleteSubscribe(c *gin.Context) {
 	var req models.Subscribe
@@ -259,11 +310,16 @@ func AddSubscribeToken(c *gin.Context) {
 		responses.BadRequest(c, "Invalid request parameters: "+err.Error())
 		return
 	}
-	req.Token = base.GenerateRandomString(24)
+	tokenValue, err := base.GenerateRandomString(24)
+	if err != nil {
+		responses.InternalServerError(c, "生成订阅Token失败")
+		return
+	}
+	req.Token = tokenValue
 	// 新增订阅Token
 	token := models.SubscribeToken{
 		Token:  req.Token,
-		Remark: req.Remark,
+		Remark: strings.TrimSpace(req.Remark),
 	}
 	if err := database.DB.Create(&token).Error; err != nil {
 		responses.InternalServerError(c, "新增订阅Token失败: "+err.Error())
@@ -336,7 +392,11 @@ func SendEmailCode(c *gin.Context) {
 		responses.InternalServerError(c, "邮件服务未配置")
 		return
 	}
-	code := base.GenerateRandomCode()
+	code, err := base.GenerateRandomCode()
+	if err != nil {
+		responses.InternalServerError(c, "生成验证码失败")
+		return
+	}
 	msg := gomail.NewMessage()
 	msg.SetHeader("From", cfg.SMTP.From)
 	msg.SetHeader("To", req.Email)

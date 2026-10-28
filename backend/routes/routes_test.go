@@ -24,4 +24,10 @@ func TestHealthAndTokenRoutes(t *testing.T) {
 	if tokenList.Code != http.StatusUnauthorized {
 		t.Fatalf("token list status = %d, want %d", tokenList.Code, http.StatusUnauthorized)
 	}
+
+	createSubscription := httptest.NewRecorder()
+	router.ServeHTTP(createSubscription, httptest.NewRequest(http.MethodPost, "/api/users/subscribe/new", nil))
+	if createSubscription.Code != http.StatusUnauthorized {
+		t.Fatalf("create subscription status = %d, want %d", createSubscription.Code, http.StatusUnauthorized)
+	}
 }

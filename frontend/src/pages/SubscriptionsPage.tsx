@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Clipboard } from '@wailsio/runtime'
 import { useAuth } from '../contexts/AuthContext'
 import { useWS } from '../contexts/WSContext'
@@ -18,6 +18,15 @@ export function SubscriptionsPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [copiedToken, setCopiedToken] = useState('')
+  const copyTimerRef = useRef<number | undefined>(undefined)
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current !== undefined) {
+        window.clearTimeout(copyTimerRef.current)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -41,24 +50,36 @@ export function SubscriptionsPage() {
     }
   }, [token])
 
+  const openAddModal = () => {
+    setError('')
+    setShowAddModal(true)
+  }
+
   const handleAddSubscribe = async (input: AddSubscribeInput) => {
     setLoading(true)
     setError('')
-    try {
-      let tokenValue = input.mode === 'existing' ? input.token : ''
-      if (input.mode === 'create') {
-        const created = await subscribeService.createToken(input.title)
-        tokenValue = created.token
-      }
+    const title = input.title.trim()
+    let subscribed = false
 
-      await subscribeService.addSubscribe({ token: tokenValue, title: input.title })
+    try {
+      if (input.mode === 'create') {
+        await subscribeService.createSubscription(title)
+      } else {
+        await subscribeService.addSubscribe({ token: input.token.trim(), title })
+      }
+      subscribed = true
+      setShowAddModal(false)
+
       const list = await subscribeService.getSubscribedTokens()
       setSubscriptions(list)
       subscribeToTokens(list.map(sub => sub.token))
-
-      setShowAddModal(false)
     } catch (e) {
-      setError(e instanceof Error ? e.message : '订阅失败')
+      if (subscribed) {
+        console.error('订阅成功但刷新列表失败', e)
+        alert('订阅已成功，但刷新订阅列表失败，请重新打开页面查看')
+      } else {
+        setError(e instanceof Error ? e.message : '订阅失败')
+      }
     } finally {
       setLoading(false)
     }
@@ -68,7 +89,10 @@ export function SubscriptionsPage() {
     try {
       await Clipboard.SetText(tokenValue)
       setCopiedToken(tokenValue)
-      window.setTimeout(() => {
+      if (copyTimerRef.current !== undefined) {
+        window.clearTimeout(copyTimerRef.current)
+      }
+      copyTimerRef.current = window.setTimeout(() => {
         setCopiedToken(current => current === tokenValue ? '' : current)
       }, 1500)
     } catch (e) {
@@ -92,7 +116,7 @@ export function SubscriptionsPage() {
     <div className="subscriptions-page">
       <div className="subscriptions-header">
         <h2>订阅管理</h2>
-        <button className="add-btn" onClick={() => setShowAddModal(true)}>
+        <button className="add-btn" onClick={openAddModal}>
           + 添加订阅
         </button>
       </div>
@@ -106,12 +130,14 @@ export function SubscriptionsPage() {
             </div>
             <div className="subscription-actions">
               <button
+                type="button"
                 className="copy-btn"
                 onClick={() => handleCopyToken(sub.token)}
               >
                 {copiedToken === sub.token ? '已复制' : '复制密钥'}
               </button>
               <button
+                type="button"
                 className="delete-btn"
                 onClick={() => handleDeleteSubscribe(sub.token)}
               >
@@ -124,7 +150,7 @@ export function SubscriptionsPage() {
         {subscriptions.length === 0 && (
           <div className="empty-state">
             <p>暂无订阅</p>
-            <button className="add-btn" onClick={() => setShowAddModal(true)}>
+            <button className="add-btn" onClick={openAddModal}>
               添加第一个订阅
             </button>
           </div>
@@ -134,6 +160,7 @@ export function SubscriptionsPage() {
       {showAddModal && (
         <AddSubscribeModal
           onClose={() => setShowAddModal(false)}
+          onClearError={() => setError('')}
           onSubmit={handleAddSubscribe}
           loading={loading}
           error={error}
@@ -145,11 +172,13 @@ export function SubscriptionsPage() {
 
 function AddSubscribeModal({
   onClose,
+  onClearError,
   onSubmit,
   loading,
   error
 }: {
   onClose: () => void
+  onClearError: () => void
   onSubmit: (input: AddSubscribeInput) => void
   loading: boolean
   error: string
@@ -160,16 +189,26 @@ function AddSubscribeModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!title) {
+    if (loading) {
+      return
+    }
+    const normalizedTitle = title.trim()
+    if (!normalizedTitle) {
       return
     }
     if (mode === 'create') {
-      onSubmit({ mode, title })
+      onSubmit({ mode, title: normalizedTitle })
       return
     }
-    if (token) {
-      onSubmit({ mode, title, token })
+    const normalizedToken = token.trim()
+    if (normalizedToken) {
+      onSubmit({ mode, title: normalizedTitle, token: normalizedToken })
     }
+  }
+
+  const changeMode = (nextMode: 'existing' | 'create') => {
+    setMode(nextMode)
+    onClearError()
   }
 
   return (
@@ -181,7 +220,7 @@ function AddSubscribeModal({
             type="button"
             className={mode === 'existing' ? 'mode-btn active' : 'mode-btn'}
             aria-pressed={mode === 'existing'}
-            onClick={() => setMode('existing')}
+            onClick={() => changeMode('existing')}
           >
             使用已有 Token
           </button>
@@ -189,7 +228,7 @@ function AddSubscribeModal({
             type="button"
             className={mode === 'create' ? 'mode-btn active' : 'mode-btn'}
             aria-pressed={mode === 'create'}
-            onClick={() => setMode('create')}
+            onClick={() => changeMode('create')}
           >
             创建新 Token
           </button>

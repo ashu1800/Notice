@@ -56,6 +56,8 @@ func RegisterRoutes(router *gin.Engine) {
 				user.GET("/tokenList", controllers.GetSubscribedTokens)
 				// 订阅推送
 				user.POST("/subscribe", controllers.AddSubscribe)
+				// 创建 Token 并订阅（原子操作）
+				user.POST("/subscribe/new", controllers.CreateSubscribeWithToken)
 				// 取消推送订阅
 				user.DELETE("/subscribe", controllers.DeleteSubscribe)
 			}

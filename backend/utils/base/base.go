@@ -1,8 +1,10 @@
 package base
 
 import (
+	"crypto/rand"
+	"errors"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"net"
 	"regexp"
 )
@@ -17,24 +19,35 @@ func EnsurePortAvailable(port string) error {
 	return nil
 }
 
-// GenerateRandomString 随机生成24位长度的字符串
-func GenerateRandomString(length int) string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+func randomString(length int, charset string) (string, error) {
+	if length <= 0 {
+		return "", errors.New("length must be positive")
+	}
+	if charset == "" {
+		return "", errors.New("charset must not be empty")
+	}
+
+	max := big.NewInt(int64(len(charset)))
 	result := make([]byte, length)
 	for i := range result {
-		result[i] = charset[rand.Intn(len(charset))]
+		index, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return "", fmt.Errorf("读取安全随机数失败: %w", err)
+		}
+		result[i] = charset[index.Int64()]
 	}
-	return string(result)
+	return string(result), nil
 }
 
-// GenerateRandomCode 生成6位长度的数字验证码
-func GenerateRandomCode() string {
-	const charset = "0123456789"
-	code := make([]byte, 6)
-	for i := range code {
-		code[i] = charset[rand.Intn(len(charset))]
-	}
-	return string(code)
+// GenerateRandomString 使用密码学安全随机数生成订阅 Token。
+func GenerateRandomString(length int) (string, error) {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	return randomString(length, charset)
+}
+
+// GenerateRandomCode 使用密码学安全随机数生成 6 位数字验证码。
+func GenerateRandomCode() (string, error) {
+	return randomString(6, "0123456789")
 }
 
 // IsValidEmail 验证邮箱格式是否正确

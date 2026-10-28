@@ -77,6 +77,7 @@ curl http://localhost:8001/health
 | GET | `/api/users/profile` | 当前用户资料 |
 | GET | `/api/users/tokenList` | 已订阅 Token |
 | POST | `/api/users/subscribe` | 订阅推送 |
+| POST | `/api/users/subscribe/new` | 创建 Token 并订阅（同一事务） |
 | DELETE | `/api/users/subscribe` | 取消订阅 |
 | POST | `/api/msg/send` | 发送消息 |
 | GET | `/api/msg/list` | 消息列表 |
