@@ -6,7 +6,7 @@ Notice 消息订阅桌面客户端：Go + Wails 3 宿主，React 18 + TypeScript
 
 | 层 | 技术 |
 | --- | --- |
-| 桌面宿主 | Go 1.24+、Wails 3.0.0 |
+| 桌面宿主 | Go 1.26+、Wails 3.0.0 |
 | 渲染层 | React 18、TypeScript 5、Vite 7 |
 | 路由 | React Router 7（HashRouter） |
 | 后端 | Go、Gin、GORM、MySQL、Redis、gorilla/websocket、JWT |
