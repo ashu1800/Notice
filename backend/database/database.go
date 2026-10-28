@@ -39,7 +39,7 @@ func InitRedis(cfg config.RedisConfig) error {
 // 任一阶段失败都返回错误，由调用方决定退出或重试。
 func InitDB(cfg config.DatabaseConfig) (*gorm.DB, error) {
 	// 1. 先连接到默认的mysql数据库
-	defaultDSN := fmt.Sprintf("%s:%s@tcp(%s:%s)/mysql?charset=utf8mb4&parseTime=True&loc=Local",
+	defaultDSN := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&parseTime=True&loc=Local",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port)
 
 	tempDB, err := gorm.Open(mysql.Open(defaultDSN), &gorm.Config{

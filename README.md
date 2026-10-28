@@ -23,7 +23,7 @@ cp config.example.yaml config.yaml
 go run .
 ```
 
-后端默认监听 `http://localhost:8001`。
+后端默认监听 `http://localhost:8001`；当前生产部署为 `http://177.4.10.175:8001`。
 
 ### 2. 启动桌面开发模式
 
@@ -108,7 +108,7 @@ Notice/
 └── backend/                # 独立 Go 服务
 ```
 
-更完整的进程模型、窗口设计、开发约定见 [docs/architecture.md](docs/architecture.md)。
+更完整的进程模型、窗口设计、开发约定见 [docs/architecture.md](docs/architecture.md)；生产后端部署见 [docs/deployment.md](docs/deployment.md)。
 
 ## 常用命令
 

@@ -16,7 +16,7 @@ const WSContext = createContext<WSContextType | undefined>(undefined)
 export function WSProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
   const [isConnected, setIsConnected] = useState(false)
-  const [wsUrl] = useState(() => import.meta.env.VITE_WS_URL || 'ws://42.193.21.212:8001/ws')
+  const [wsUrl] = useState(() => import.meta.env.VITE_WS_URL || 'ws://177.4.10.175:8001/ws')
   const { showToast } = useToast()
   const toastHandlerRef = useRef<(() => void) | null>(null)
 

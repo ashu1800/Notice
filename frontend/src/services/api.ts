@@ -1,6 +1,6 @@
 import { ApiError, NetworkError, AuthError } from './errors'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://42.193.21.212:8001/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://177.4.10.175:8001/api'
 
 interface ApiResponse<T> {
   code: number
