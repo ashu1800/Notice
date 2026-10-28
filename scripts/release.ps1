@@ -106,7 +106,7 @@ finally {
 Write-Host "== Updating version ==" -ForegroundColor Cyan
 Write-Utf8NoBom (Join-Path $Root "VERSION") "$Version`n"
 $ConfigPath = Join-Path $Root "build/config.yml"
-$Config = Get-Content -Raw $ConfigPath
+$Config = Get-Content -Raw -Encoding UTF8 $ConfigPath
 $Config = [regex]::Replace($Config, '(?m)^(\s*version:\s*")[^"]+(")', ('${1}' + $Version + '${2}'))
 Write-Utf8NoBom $ConfigPath $Config
 

@@ -8,7 +8,7 @@ info:
   companyName: "Notice" # The name of the company
   productName: "Notice" # The name of the application
   productIdentifier: "com.notice.desktop" # The unique product identifier
-  description: "Notice 娑堟伅璁㈤槄妗岄潰瀹㈡埛绔? # The application description
+  description: "Notice 消息订阅桌面客户端" # The application description
   copyright: "Copyright 2026 Notice" # Copyright text
   comments: "Notice Desktop" # Comments
   version: "1.0.1" # The application version
