@@ -53,6 +53,8 @@ wails3 build
 wails3 package
 ```
 
+安装包产物：`bin/Notice-amd64-installer.exe`。
+
 ## 目录
 
 ```
