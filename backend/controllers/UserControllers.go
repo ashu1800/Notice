@@ -269,7 +269,7 @@ func AddSubscribeToken(c *gin.Context) {
 		responses.InternalServerError(c, "新增订阅Token失败: "+err.Error())
 		return
 	}
-	responses.SuccessWithMessage(c, "新增订阅Token成功", nil)
+	responses.SuccessWithMessage(c, "新增订阅Token成功", token)
 }
 
 // DeleteSubscribeToken TODO: 删除订阅Token

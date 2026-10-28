@@ -11,9 +11,23 @@ interface SubscribeResponse {
   message: string
 }
 
+export interface CreatedToken {
+  id: number
+  token: string
+  remark: string
+  created_at: string
+}
+
 export const subscribeService = {
   async getSubscribedTokens() {
     return request<Subscribe[]>('/users/tokenList')
+  },
+
+  async createToken(remark: string) {
+    return request<CreatedToken>('/token/add', {
+      method: 'POST',
+      body: JSON.stringify({ remark })
+    })
   },
 
   async addSubscribe(data: SubscribeRequest) {

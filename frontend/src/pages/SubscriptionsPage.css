@@ -66,6 +66,28 @@
   word-break: break-all;
 }
 
+.subscription-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.copy-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
 .delete-btn {
   padding: 8px 16px;
   background: transparent;
@@ -144,6 +166,46 @@
 .modal-content .input-group input:focus {
   outline: none;
   border-color: var(--primary-color);
+}
+
+.subscribe-mode-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 4px;
+  background: var(--hover-bg);
+  border-radius: 8px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-btn:hover {
+  color: var(--text-primary);
+}
+
+.mode-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.input-hint {
+  padding: 10px 12px;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 16px;
 }
 
 .modal-actions {

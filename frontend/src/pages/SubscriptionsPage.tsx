@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
+import { Clipboard } from '@wailsio/runtime'
 import { useAuth } from '../contexts/AuthContext'
 import { useWS } from '../contexts/WSContext'
 import { subscribeService } from '../services/subscribe'
 import type { Subscribe } from '../types'
 import './SubscriptionsPage.css'
+
+type AddSubscribeInput =
+  | { mode: 'existing'; title: string; token: string }
+  | { mode: 'create'; title: string }
 
 export function SubscriptionsPage() {
   const { token } = useAuth()
@@ -12,6 +17,7 @@ export function SubscriptionsPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [copiedToken, setCopiedToken] = useState('')
 
   useEffect(() => {
     let active = true
@@ -35,11 +41,17 @@ export function SubscriptionsPage() {
     }
   }, [token])
 
-  const handleAddSubscribe = async (tokenValue: string, title: string) => {
+  const handleAddSubscribe = async (input: AddSubscribeInput) => {
     setLoading(true)
     setError('')
     try {
-      await subscribeService.addSubscribe({ token: tokenValue, title })
+      let tokenValue = input.mode === 'existing' ? input.token : ''
+      if (input.mode === 'create') {
+        const created = await subscribeService.createToken(input.title)
+        tokenValue = created.token
+      }
+
+      await subscribeService.addSubscribe({ token: tokenValue, title: input.title })
       const list = await subscribeService.getSubscribedTokens()
       setSubscriptions(list)
       subscribeToTokens(list.map(sub => sub.token))
@@ -49,6 +61,18 @@ export function SubscriptionsPage() {
       setError(e instanceof Error ? e.message : '订阅失败')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCopyToken = async (tokenValue: string) => {
+    try {
+      await Clipboard.SetText(tokenValue)
+      setCopiedToken(tokenValue)
+      window.setTimeout(() => {
+        setCopiedToken(current => current === tokenValue ? '' : current)
+      }, 1500)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : '复制密钥失败')
     }
   }
 
@@ -80,12 +104,20 @@ export function SubscriptionsPage() {
               <h3 className="subscription-title">{sub.title}</h3>
               <p className="subscription-token">{sub.token}</p>
             </div>
-            <button
-              className="delete-btn"
-              onClick={() => handleDeleteSubscribe(sub.token)}
-            >
-              取消订阅
-            </button>
+            <div className="subscription-actions">
+              <button
+                className="copy-btn"
+                onClick={() => handleCopyToken(sub.token)}
+              >
+                {copiedToken === sub.token ? '已复制' : '复制密钥'}
+              </button>
+              <button
+                className="delete-btn"
+                onClick={() => handleDeleteSubscribe(sub.token)}
+              >
+                取消订阅
+              </button>
+            </div>
           </div>
         ))}
 
@@ -118,17 +150,25 @@ function AddSubscribeModal({
   error
 }: {
   onClose: () => void
-  onSubmit: (token: string, title: string) => void
+  onSubmit: (input: AddSubscribeInput) => void
   loading: boolean
   error: string
 }) {
+  const [mode, setMode] = useState<'existing' | 'create'>('existing')
   const [token, setToken] = useState('')
   const [title, setTitle] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (token && title) {
-      onSubmit(token, title)
+    if (!title) {
+      return
+    }
+    if (mode === 'create') {
+      onSubmit({ mode, title })
+      return
+    }
+    if (token) {
+      onSubmit({ mode, title, token })
     }
   }
 
@@ -136,6 +176,24 @@ function AddSubscribeModal({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <h3>添加订阅</h3>
+        <div className="subscribe-mode-toggle" role="group" aria-label="订阅方式">
+          <button
+            type="button"
+            className={mode === 'existing' ? 'mode-btn active' : 'mode-btn'}
+            aria-pressed={mode === 'existing'}
+            onClick={() => setMode('existing')}
+          >
+            使用已有 Token
+          </button>
+          <button
+            type="button"
+            className={mode === 'create' ? 'mode-btn active' : 'mode-btn'}
+            aria-pressed={mode === 'create'}
+            onClick={() => setMode('create')}
+          >
+            创建新 Token
+          </button>
+        </div>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label>订阅备注名</label>
@@ -147,23 +205,31 @@ function AddSubscribeModal({
               required
             />
           </div>
-          <div className="input-group">
-            <label>订阅Token</label>
-            <input
-              type="text"
-              value={token}
-              onChange={e => setToken(e.target.value)}
-              placeholder="请输入订阅Token"
-              required
-            />
-          </div>
+          {mode === 'existing' ? (
+            <div className="input-group">
+              <label>订阅Token</label>
+              <input
+                type="text"
+                value={token}
+                onChange={e => setToken(e.target.value)}
+                placeholder="请输入订阅Token"
+                required
+              />
+            </div>
+          ) : (
+            <div className="input-hint">
+              系统会自动生成新的订阅 Token，并立即订阅到当前账号。
+            </div>
+          )}
           {error && <div className="error-message">{error}</div>}
           <div className="modal-actions">
             <button type="button" className="cancel-btn" onClick={onClose}>
               取消
             </button>
             <button type="submit" className="confirm-btn" disabled={loading}>
-              {loading ? '添加中...' : '确认添加'}
+              {loading
+                ? mode === 'create' ? '创建中...' : '添加中...'
+                : mode === 'create' ? '创建并订阅' : '确认添加'}
             </button>
           </div>
         </form>
