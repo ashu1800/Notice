@@ -10,6 +10,6 @@ type Subscribe struct {
 	Title      string    `gorm:"index" json:"title"` // 订阅标题
 }
 
-func (Subscribe) TabName() string {
+func (Subscribe) TableName() string {
 	return "subscribes"
 }

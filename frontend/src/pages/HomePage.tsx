@@ -27,6 +27,7 @@ export function HomePage() {
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const messageListRef = useRef<HTMLDivElement>(null)
   const requestGuardRef = useRef(createLatestRequestGuard())
+  const latestLoadingRequestRef = useRef(0)
 
   // 检查是否有订阅
   useEffect(() => {
@@ -79,6 +80,7 @@ export function HomePage() {
     if (!token || !hasSubscriptions) return
 
     const requestId = requestGuardRef.current.next()
+    latestLoadingRequestRef.current = requestId
     setLoading(true)
     try {
       const response = await messageService.getMessages(pageNum, 20)
@@ -91,7 +93,8 @@ export function HomePage() {
     } catch (e) {
       console.error('加载消息失败', e)
     } finally {
-      if (requestGuardRef.current.isLatest(requestId)) {
+      // 只允许最新请求结束 loading；被 invalidate 的旧请求不能覆盖新请求状态。
+      if (latestLoadingRequestRef.current === requestId) {
         setLoading(false)
         setIsRefreshing(false)
       }

@@ -106,6 +106,7 @@ go build -o ../bin/notice-backend.exe .
 
 - `backend/config.yaml` 是本地真实配置，已被忽略；仓库只保留 `backend/config.example.yaml`。
 - 支持 `NOTICE_DATABASE_PASSWORD`、`NOTICE_REDIS_PASSWORD`、`NOTICE_JWT_SECRET`、`NOTICE_SMTP_PASSWORD` 覆盖敏感配置。
+- `NOTICE_JWT_SECRET` 至少 32 字符；后端会拒绝模板占位密钥并直接退出。
 - 账号密码写入 Windows Credential Manager，`accounts.json` 只保存邮箱和时间戳。
 - 桌面端不打包后端；部署时分别运行 `Notice.exe` 和 `notice-backend.exe`。
 

@@ -112,6 +112,9 @@ wails3 generate bindings -ts
   - `NOTICE_REDIS_PASSWORD`
   - `NOTICE_JWT_SECRET`
   - `NOTICE_SMTP_PASSWORD`
+- `NOTICE_JWT_SECRET` 至少 32 字符，后端会拒绝模板占位密钥。
+- Token 管理接口需要登录；认证失败统一返回 401。
+- CORS 和 WebSocket 只接受 `wails.localhost` / `localhost` / `127.0.0.1` 来源。
 
 ## 5. 前端结构
 

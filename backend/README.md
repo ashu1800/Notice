@@ -36,7 +36,7 @@ cd backend
 cp config.example.yaml config.yaml
 ```
 
-3. 修改 `config.yaml` 的数据库、Redis、SMTP 配置。`config.yaml` 已被 `.gitignore` 忽略，不要提交真实密码。
+3. 修改 `config.yaml` 的数据库、Redis、SMTP 配置，并设置至少 32 字符的 `app.jwt_secret`。`config.yaml` 已被 `.gitignore` 忽略，不要提交真实密码。
 4. 启动：
 
 ```bash
@@ -59,7 +59,7 @@ curl http://localhost:8001/health
 | --- | --- |
 | `NOTICE_DATABASE_PASSWORD` | MySQL 密码 |
 | `NOTICE_REDIS_PASSWORD` | Redis 密码 |
-| `NOTICE_JWT_SECRET` | JWT 签名密钥 |
+| `NOTICE_JWT_SECRET` | JWT 签名密钥（至少 32 字符，不能使用模板占位值） |
 | `NOTICE_SMTP_PASSWORD` | SMTP 授权码/密码 |
 
 ## 主要接口
@@ -71,9 +71,9 @@ curl http://localhost:8001/health
 | POST | `/api/auth/login` | 登录 |
 | POST | `/api/auth/sendEmailCode` | 发送邮箱验证码 |
 | POST | `/api/auth/resetPassword` | 重置密码 |
-| POST | `/api/token/add` | 新增订阅 Token |
-| POST | `/api/token/delete` | 删除订阅 Token |
-| GET | `/api/token/list` | Token 列表 |
+| POST | `/api/token/add` | 新增订阅 Token（需登录） |
+| POST | `/api/token/delete` | 删除订阅 Token（需登录） |
+| GET | `/api/token/list` | Token 列表（需登录） |
 | GET | `/api/users/profile` | 当前用户资料 |
 | GET | `/api/users/tokenList` | 已订阅 Token |
 | POST | `/api/users/subscribe` | 订阅推送 |

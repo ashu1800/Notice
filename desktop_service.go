@@ -54,7 +54,7 @@ func newDesktopService(logger *slog.Logger) *DesktopService {
 
 func (s *DesktopService) setApp(app *application.App) {
 	s.app = app
-	s.toast = NewToastManager(app, s.logger)
+	s.toast = NewToastManager(app)
 }
 
 func (s *DesktopService) createMainWindow() {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"log/slog"
 	"sync"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -17,15 +16,14 @@ type ToastPayload struct {
 
 type ToastManager struct {
 	app     *application.App
-	logger  *slog.Logger
 	mu      sync.Mutex
 	window  *application.WebviewWindow
 	pending []ToastPayload
 	ready   bool
 }
 
-func NewToastManager(app *application.App, logger *slog.Logger) *ToastManager {
-	return &ToastManager{app: app, logger: logger}
+func NewToastManager(app *application.App) *ToastManager {
+	return &ToastManager{app: app}
 }
 
 func (t *ToastManager) Show(title string, content string, duration int, theme string) error {

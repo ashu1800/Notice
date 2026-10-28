@@ -54,6 +54,11 @@ func Error(c *gin.Context, httpCode int, message string) {
 	})
 }
 
+// Unauthorized 401错误响应
+func Unauthorized(c *gin.Context, message string) {
+	Error(c, http.StatusUnauthorized, message)
+}
+
 // BadRequest 400错误响应
 func BadRequest(c *gin.Context, message string) {
 	Error(c, http.StatusBadRequest, message)

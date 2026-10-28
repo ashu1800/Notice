@@ -10,14 +10,12 @@ import (
 var trayIcon []byte
 
 type TrayState struct {
-	app           *application.App
-	service       *DesktopService
 	menu          *application.Menu
 	autostartItem *application.MenuItem
 }
 
 func (s *DesktopService) setupTray() {
-	tray := &TrayState{app: s.app, service: s}
+	tray := &TrayState{}
 	s.tray = tray
 
 	systray := s.app.SystemTray.New()

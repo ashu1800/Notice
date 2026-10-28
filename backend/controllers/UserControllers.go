@@ -393,5 +393,7 @@ func ResetPassword(c *gin.Context) {
 		responses.InternalServerError(c, "更新密码失败")
 		return
 	}
+	// 验证码一次性使用，成功后立即删除，避免在 TTL 内被重放。
+	database.Redis.Del(context.Background(), req.Email)
 	responses.SuccessWithMessage(c, "密码重置成功", nil)
 }

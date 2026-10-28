@@ -51,6 +51,12 @@ func GetMsg(c *gin.Context) {
 	if pageSize < 1 {
 		pageSize = 10
 	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
+	if page > 100000 {
+		page = 100000
+	}
 	userID, exists := c.Get("userID")
 	if !exists {
 		responses.BadRequest(c, "用户未认证")

@@ -2,6 +2,7 @@ package config
 
 import (
 	"Notice/utils/logger"
+	"fmt"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -94,8 +95,25 @@ func LoadConfig() *Config {
 		logger.Fatal.Println("Failed to unmarshal config:", err)
 	}
 
+	if err := config.Validate(); err != nil {
+		logger.Fatal.Println("Invalid config:", err)
+	}
+
 	logger.Info.Println("Config loaded successfully")
 	return config
+}
+
+// Validate 拒绝明显的占位密钥，避免部署时使用可预测的 JWT 签名密钥。
+func (c *Config) Validate() error {
+	secret := strings.TrimSpace(c.App.JWTSecret)
+	if len(secret) < 32 {
+		return fmt.Errorf("app.jwt_secret must be at least 32 characters (set NOTICE_JWT_SECRET)")
+	}
+	switch secret {
+	case "your_jwt_secret_key", "change-me-to-a-random-secret":
+		return fmt.Errorf("app.jwt_secret is still a placeholder; set NOTICE_JWT_SECRET")
+	}
+	return nil
 }
 
 // 为嵌套结构体定义Get方法，保持向后兼容

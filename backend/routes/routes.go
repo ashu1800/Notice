@@ -34,8 +34,8 @@ func RegisterRoutes(router *gin.Engine) {
 			// 找回密码路由
 			public.POST("/resetPassword", controllers.ResetPassword)
 		}
-		// 订阅Token路由
-		token := api.Group("/token")
+		// 订阅Token管理路由（需要登录）
+		token := api.Group("/token", middleware.Auth())
 		{
 			// 新增订阅Token路由
 			token.POST("/add", controllers.AddSubscribeToken)

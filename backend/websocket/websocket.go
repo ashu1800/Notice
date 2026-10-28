@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"Notice/models"
+	"Notice/utils/origin"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -34,9 +35,7 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-		// TODO: 建议配置允许的源列表,提高安全性
-		// allowedOrigins := []string{"https://yourdomain.com"}
-		return true
+		return origin.Allowed(r.Header.Get("Origin"))
 	},
 }
 
@@ -214,15 +213,12 @@ func (s *Server) Run() {
 				delete(s.Clients, client.ClientID)
 				s.ClientCount.Add(-1)
 				log.Printf("[Server] 客户端 %s 已断开, 当前连接数: %d", client.ClientID, s.ClientCount.Load())
-				// 安全关闭通道
-				select {
-				case <-client.Send:
-					// 通道已关闭
-				default:
-					close(client.Send)
-				}
 			}
 			s.Mutex.Unlock()
+			// 不在这里关闭 client.Send：发送方可能刚通过 Closed 检查，
+			// 关闭通道会造成 send on closed channel panic。连接关闭后
+			// writePump 会在下一次写入失败时退出。
+			client.close()
 		}
 	}
 }

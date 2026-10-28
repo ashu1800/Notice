@@ -18,7 +18,7 @@ type Claims struct {
 func GenerateToken(userID uint) (string, error) {
 	cfg := config.LoadConfig()
 
-	// 设置过期时间为24小时
+	// 设置过期时间为7天
 	expireTime := time.Now().Add(7 * 24 * time.Hour)
 
 	// 创建Claims
@@ -61,8 +61,11 @@ func ParseToken(tokenString string) (*Claims, error) {
 		return nil, err
 	}
 
-	// 验证令牌有效性
+	// 验证令牌有效性；必须包含过期时间和用户 ID。
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+		if claims.ExpiresAt == nil || claims.UserID == 0 {
+			return nil, errors.New("invalid token claims")
+		}
 		return claims, nil
 	}
 

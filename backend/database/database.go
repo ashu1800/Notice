@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -34,33 +35,31 @@ func InitRedis(cfg config.RedisConfig) error {
 	return err
 }
 
-// InitDB 初始化数据库连接并返回数据库实例
+// InitDB 初始化数据库连接并返回数据库实例。
+// 任一阶段失败都返回错误，由调用方决定退出或重试。
 func InitDB(cfg config.DatabaseConfig) (*gorm.DB, error) {
 	// 1. 先连接到默认的mysql数据库
 	defaultDSN := fmt.Sprintf("%s:%s@tcp(%s:%s)/mysql?charset=utf8mb4&parseTime=True&loc=Local",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port)
 
 	tempDB, err := gorm.Open(mysql.Open(defaultDSN), &gorm.Config{
-		Logger: gormLogger.Default.LogMode(gormLogger.Silent), // 静默模式避免过多日志
+		Logger: gormLogger.Default.LogMode(gormLogger.Silent),
 	})
-
 	if err != nil {
-		logger.Fatal.Println("Failed to connect to default database:", err)
+		return nil, fmt.Errorf("connect default database: %w", err)
 	}
 
 	// 2. 检查目标数据库是否存在
 	var exists int64
-	err = tempDB.Raw("SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?", cfg.DBName).Scan(&exists).Error
-	if err != nil {
-		logger.Fatal.Println("Failed to check database existence:", err)
+	if err := tempDB.Raw("SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?", cfg.DBName).Scan(&exists).Error; err != nil {
+		return nil, fmt.Errorf("check database existence: %w", err)
 	}
 
-	// 3. 如果数据库不存在，则创建
+	// 3. 如果数据库不存在，则创建。数据库名来自本地配置，不接受请求输入。
 	if exists == 0 {
 		logger.Info.Println("Database '" + cfg.DBName + "' does not exist, creating...")
-		err = tempDB.Exec("CREATE DATABASE `" + cfg.DBName + "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci").Error
-		if err != nil {
-			logger.Fatal.Println("Failed to create database:", err)
+		if err := tempDB.Exec("CREATE DATABASE `" + cfg.DBName + "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci").Error; err != nil {
+			return nil, fmt.Errorf("create database: %w", err)
 		}
 		logger.Info.Println("Database '" + cfg.DBName + "' created successfully")
 	}
@@ -68,33 +67,30 @@ func InitDB(cfg config.DatabaseConfig) (*gorm.DB, error) {
 	// 4. 关闭临时连接
 	tempSQLDB, err := tempDB.DB()
 	if err != nil {
-		logger.Error.Println("Warning: Failed to get temp database instance:", err)
-	} else {
-		tempSQLDB.Close()
+		return nil, fmt.Errorf("get temporary database instance: %w", err)
 	}
+	_ = tempSQLDB.Close()
 
 	// 5. 连接到目标数据库
 	targetDSN := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
 
-	var dbErr error
-	DB, dbErr = gorm.Open(mysql.Open(targetDSN), &gorm.Config{
-		Logger: gormLogger.Default.LogMode(gormLogger.Silent), // 生产模式，不打印SQL语句
+	DB, err = gorm.Open(mysql.Open(targetDSN), &gorm.Config{
+		Logger: gormLogger.Default.LogMode(gormLogger.Silent),
 	})
-
-	if dbErr != nil {
-		logger.Fatal.Println("Failed to connect to target database:", dbErr)
+	if err != nil {
+		return nil, fmt.Errorf("connect target database: %w", err)
 	}
 
 	// 6. 获取数据库实例并配置连接池
 	sqlDB, err := DB.DB()
 	if err != nil {
-		logger.Fatal.Println("Failed to get database instance:", err)
+		return nil, fmt.Errorf("get database instance: %w", err)
 	}
 
 	// 7. 测试连接
 	if err := sqlDB.Ping(); err != nil {
-		logger.Fatal.Println("Failed to ping database:", err)
+		return nil, fmt.Errorf("ping database: %w", err)
 	}
 
 	// 8. 配置连接池
@@ -107,17 +103,16 @@ func InitDB(cfg config.DatabaseConfig) (*gorm.DB, error) {
 
 // AutoMigrate 自动迁移数据库模型
 func AutoMigrate() error {
-	// 在这里添加所有需要迁移的模型
-	err := DB.AutoMigrate(
+	if DB == nil {
+		return errors.New("database not initialized")
+	}
+	if err := DB.AutoMigrate(
 		&models.User{},
 		&models.Message{},
 		&models.SubscribeToken{},
 		&models.Subscribe{},
-	)
-
-	if err != nil {
-		logger.Fatal.Println("Failed to migrate database:", err)
+	); err != nil {
+		return fmt.Errorf("auto migrate: %w", err)
 	}
-
 	return nil
 }

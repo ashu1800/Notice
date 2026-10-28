@@ -7,11 +7,21 @@ window.onerror = (message, source, lineno, colno, error) => {
   console.error('[Global Error]', { message, source, lineno, colno, error })
   const root = document.getElementById('root')
   if (root) {
-    root.innerHTML = `<div style="padding: 20px; color: red;">
-      <h2>应用加载出错</h2>
-      <pre>${message}</pre>
-      <pre>${error?.stack || ''}</pre>
-    </div>`
+    const container = document.createElement('div')
+    container.style.padding = '20px'
+    container.style.color = 'red'
+
+    const title = document.createElement('h2')
+    title.textContent = '应用加载出错'
+
+    const messageElement = document.createElement('pre')
+    messageElement.textContent = String(message)
+
+    const stackElement = document.createElement('pre')
+    stackElement.textContent = error?.stack || ''
+
+    container.append(title, messageElement, stackElement)
+    root.replaceChildren(container)
   }
 }
 
