@@ -31,6 +31,20 @@ sudo systemctl status notice-backend --no-pager
 curl http://127.0.0.1:8001/health
 ```
 
+## 更新源
+
+后端同时对外提供更新清单与安装包缓存，让无法访问 GitHub 的客户端能正常更新：
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/update/latest` | Wails 更新清单，代理 GitHub 最新 Release 元数据（缓存 5 分钟） |
+| `GET /api/update/download` | 返回缓存的最新版安装包；缺失时先下载到 `updates/` 再返回 |
+
+- 缓存目录默认为服务工作目录下的 `updates/`，可用 `NOTICE_UPDATE_DIR` 覆盖。
+- 拉取 GitHub 的 API 地址可用 `NOTICE_UPDATE_API_BASE` 覆盖（镜像或 GitHub Enterprise）。
+- 目录内 `meta.json` 记录当前缓存版本的 SHA-256，便于核对。
+- GitHub 完全不可达且无缓存时，下载接口会 302 回 GitHub 直链。
+
 ## 日志
 
 ```bash

@@ -31,6 +31,10 @@ Unicode true
 ## !define REQUEST_EXECUTION_LEVEL "admin"            # Default "admin"  see also https://nsis.sourceforge.io/Docs/Chapter4.html
 ## !define WAILS_INSTALL_SCOPE     "user"             # Default "machine" - set to "user" for per-user install ($LOCALAPPDATA) without UAC prompt
 ####
+## 安装到用户目录：程序目录可写，内置更新器才能在不提权的情况下
+## 把新版本写回安装目录（安装到 Program Files 时会因 UAC 拒绝而更新失败）。
+!define WAILS_INSTALL_SCOPE "user"
+####
 ## Include the wails tools
 ####
 !include "wails_tools.nsh"

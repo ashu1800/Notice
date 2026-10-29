@@ -14,7 +14,7 @@ const themeOptions: { value: ThemeMode; label: string; icon: IconName }[] = [
 ]
 
 export function SettingsPage() {
-  const { clearSettingsCache } = useToast()
+  const { clearSettingsCache, showToast } = useToast()
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     return (localStorage.getItem('themeMode') as ThemeMode) || 'system'
   })
@@ -127,7 +127,10 @@ export function SettingsPage() {
     try {
       await settingsService.checkForUpdates()
     } catch (e) {
+      // 受保护安装目录会走下载页，需要把原因告诉用户
+      const message = e instanceof Error ? e.message : '检查更新失败'
       console.error('检查更新失败', e)
+      await showToast('更新提示', message, 6000)
     } finally {
       setCheckingUpdate(false)
     }

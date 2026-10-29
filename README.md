@@ -57,12 +57,20 @@ wails3 package
 
 ## 自动更新
 
-应用通过 [GitHub Releases](https://github.com/ashu1800/Notice/releases) 检查更新：
+应用优先走自有后端中转的更新源，GitHub 不可达时也能更新：
+
+1. `GET /api/update/latest` 返回 Wails 更新清单（后端代理 GitHub Release 元数据）。
+2. `GET /api/update/download` 返回服务器缓存的安装包，首次请求时后台缓存到 `updates/`。
+3. 该源不可用时回退到 [GitHub Releases](https://github.com/ashu1800/Notice/releases) 直连。
+
+其他约定：
 
 - 托盘菜单或「设置 → 关于 → 检查更新」打开更新窗口。
 - 发布资源包含 `Notice-windows-amd64.exe` 和 `SHA256SUMS`。
 - 下载后校验 SHA-256，再通过 Wails updater helper 替换当前进程并重启。
 - `VERSION` 是应用版本单一来源；`build/config.yml` 的版本在发布时同步更新。
+- 安装包按用户安装到用户目录，安装目录可写，自动更新才能落盘。
+- 可用 `NOTICE_UPDATE_URL` 覆盖更新清单地址，`NOTICE_UPDATE_API_BASE` 覆盖后端拉取 GitHub 的 API 地址。
 - 可通过 `NOTICE_GITHUB_REPO=owner/repo` 覆盖更新仓库（开发测试用）；私有仓库可设置 `NOTICE_GITHUB_TOKEN`。
 
 ## 一键发布新版本

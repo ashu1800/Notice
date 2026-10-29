@@ -73,6 +73,13 @@ func RegisterRoutes(router *gin.Engine) {
 				msgAuth.GET("/list", controllers.GetMsg)
 			}
 		}
+		// 更新源路由：把 GitHub Release 包装成 Wails 更新清单，
+		// 让无法访问 GitHub 的客户端改走本服务。
+		update := api.Group("/update")
+		{
+			update.GET("/latest", controllers.GetUpdateManifest)
+			update.GET("/download", controllers.DownloadUpdate)
+		}
 	}
 
 	// 404处理

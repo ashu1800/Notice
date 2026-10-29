@@ -191,11 +191,24 @@ func (s *DesktopService) GetAppVersion() string {
 	return appVersion
 }
 
-// CheckForUpdates 打开 Wails 内置更新窗口，检查 GitHub Release 并按提示下载安装。
+// CheckForUpdates 打开 Wails 内置更新窗口，检查更新源并按提示下载安装。
+// 安装在不可写目录（例如 Program Files）时，内置更新器无法落盘，
+// 改为打开下载页，让用户用安装包覆盖升级。
 func (s *DesktopService) CheckForUpdates() error {
 	if s.app == nil || s.app.Updater == nil {
 		return errors.New("自动更新器不可用")
 	}
+
+	if !installDirWritable() {
+		s.logger.Warn("安装目录不可写，改为打开下载页")
+		go func() {
+			if err := s.app.Browser.OpenURL(updateDownloadPage()); err != nil {
+				s.logger.Error("打开下载页失败", "error", err)
+			}
+		}()
+		return errors.New("当前安装在受保护目录，已为你打开下载页，请下载安装包覆盖升级")
+	}
+
 	go func() {
 		if err := s.app.Updater.CheckAndInstall(context.Background()); err != nil {
 			s.logger.Error("检查更新失败", "error", err)
