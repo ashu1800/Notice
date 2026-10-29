@@ -96,6 +96,7 @@ export class LoginItemSettings {
 export class NotificationSettings {
     "showNotificationWindow": boolean;
     "notificationDuration": number;
+    "notificationAlwaysOnTop": boolean;
 
     /** Creates a new NotificationSettings instance. */
     constructor($$source: Partial<NotificationSettings> = {}) {
@@ -104,6 +105,9 @@ export class NotificationSettings {
         }
         if (!("notificationDuration" in $$source)) {
             this["notificationDuration"] = 0;
+        }
+        if (!("notificationAlwaysOnTop" in $$source)) {
+            this["notificationAlwaysOnTop"] = false;
         }
 
         Object.assign(this, $$source);

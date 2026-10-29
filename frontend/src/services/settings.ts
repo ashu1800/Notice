@@ -48,7 +48,11 @@ export const settingsService = {
     return GetNotificationSettings()
   },
 
-  async setNotificationSettings(settings: { showNotificationWindow: boolean; notificationDuration: number }) {
+  async setNotificationSettings(settings: {
+    showNotificationWindow: boolean
+    notificationDuration: number
+    notificationAlwaysOnTop: boolean
+  }) {
     return SetNotificationSettings(settings)
   }
 }

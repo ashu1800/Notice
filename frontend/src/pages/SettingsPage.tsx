@@ -23,6 +23,7 @@ export function SettingsPage() {
   const [closeToTray, setCloseToTray] = useState(false)
   const [showNotificationWindow, setShowNotificationWindow] = useState(true)
   const [notificationDuration, setNotificationDuration] = useState(5)
+  const [notificationAlwaysOnTop, setNotificationAlwaysOnTop] = useState(true)
   const [appVersion, setAppVersion] = useState('1.0.0')
   const [checkingUpdate, setCheckingUpdate] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -48,6 +49,7 @@ export function SettingsPage() {
         setCloseToTray(closeBehaviorSetting.closeToTray)
         setShowNotificationWindow(notificationSettings.showNotificationWindow)
         setNotificationDuration(notificationSettings.notificationDuration)
+        setNotificationAlwaysOnTop(notificationSettings.notificationAlwaysOnTop ?? true)
       } catch (e) {
         console.error('加载设置失败', e)
       }
@@ -111,7 +113,8 @@ export function SettingsPage() {
     try {
       await settingsService.setNotificationSettings({
         showNotificationWindow: enabled,
-        notificationDuration
+        notificationDuration,
+        notificationAlwaysOnTop
       })
       setShowNotificationWindow(enabled)
       clearSettingsCache?.()
@@ -136,12 +139,30 @@ export function SettingsPage() {
     }
   }
 
+  const handleNotificationAlwaysOnTopChange = async (enabled: boolean) => {
+    setLoading(true)
+    try {
+      await settingsService.setNotificationSettings({
+        showNotificationWindow,
+        notificationDuration,
+        notificationAlwaysOnTop: enabled
+      })
+      setNotificationAlwaysOnTop(enabled)
+      clearSettingsCache?.()
+    } catch (e) {
+      console.error('设置通知置顶失败', e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleNotificationDurationChange = async (duration: number) => {
     setLoading(true)
     try {
       await settingsService.setNotificationSettings({
         showNotificationWindow,
-        notificationDuration: duration
+        notificationDuration: duration,
+        notificationAlwaysOnTop
       })
       setNotificationDuration(duration)
       clearSettingsCache?.()
@@ -290,6 +311,24 @@ export function SettingsPage() {
                   disabled={loading}
                   aria-label="通知显示时长"
                 />
+              </div>
+            )}
+            {showNotificationWindow && (
+              <div className="setting-item">
+                <div className="setting-info">
+                  <span className="setting-label">始终显示在最上层</span>
+                  <span className="setting-desc">弹窗盖住其它窗口；关闭后只在上层无遮挡时可见</span>
+                </div>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={notificationAlwaysOnTop}
+                    onChange={e => handleNotificationAlwaysOnTopChange(e.target.checked)}
+                    disabled={loading}
+                    aria-label="通知始终显示在最上层"
+                  />
+                  <span className="toggle-slider" />
+                </label>
               </div>
             )}
           </div>

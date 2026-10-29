@@ -20,10 +20,23 @@ type ToastManager struct {
 	window  *application.WebviewWindow
 	pending []ToastPayload
 	ready   bool
+	onTop   bool
 }
 
 func NewToastManager(app *application.App) *ToastManager {
-	return &ToastManager{app: app}
+	// 默认置顶：通知必须盖在其它窗口之上才有意义
+	return &ToastManager{app: app, onTop: true}
+}
+
+// SetAlwaysOnTop 设置通知窗口是否置顶；对已存在的窗口立即生效。
+func (t *ToastManager) SetAlwaysOnTop(onTop bool) {
+	t.mu.Lock()
+	t.onTop = onTop
+	window := t.window
+	t.mu.Unlock()
+	if window != nil {
+		window.SetAlwaysOnTop(onTop)
+	}
 }
 
 func (t *ToastManager) Show(title string, content string, duration int, theme string) error {
@@ -123,7 +136,16 @@ func (t *ToastManager) ensureWindow() {
 		wsExNoActivate          = 0x08000000
 		wsExToolWindow          = 0x00000080
 		wsExNoRedirectionBitmap = 0x00200000
+		wsExTopmost             = 0x00000008
 	)
+
+	// Wails 在 ExStyle 非 0 时会整段替换它自己算好的扩展样式，
+	// 于是 AlwaysOnTop 对应的 WS_EX_TOPMOST 会被丢掉。
+	// 这里显式补回去，保证通知真的压在其它窗口之上。
+	exStyle := wsExNoActivate | wsExToolWindow | wsExNoRedirectionBitmap
+	if t.onTop {
+		exStyle |= wsExTopmost
+	}
 
 	t.window = t.app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Name:           "toast",
@@ -132,14 +154,14 @@ func (t *ToastManager) ensureWindow() {
 		Height:         150,
 		Frameless:      true,
 		Hidden:         true,
-		AlwaysOnTop:    true,
+		AlwaysOnTop:    t.onTop,
 		DisableResize:  true,
 		URL:            "/toast.html",
 		BackgroundType: application.BackgroundTypeTransparent,
 		Windows: application.WindowsWindow{
 			HiddenOnTaskbar:                   true,
 			DisableFramelessWindowDecorations: true,
-			ExStyle:                           wsExNoActivate | wsExToolWindow | wsExNoRedirectionBitmap,
+			ExStyle:                           exStyle,
 		},
 	})
 }

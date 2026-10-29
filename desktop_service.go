@@ -26,8 +26,9 @@ type CloseBehaviorSetting struct {
 }
 
 type NotificationSettings struct {
-	ShowNotificationWindow bool `json:"showNotificationWindow"`
-	NotificationDuration   int  `json:"notificationDuration"`
+	ShowNotificationWindow  bool `json:"showNotificationWindow"`
+	NotificationDuration    int  `json:"notificationDuration"`
+	NotificationAlwaysOnTop bool `json:"notificationAlwaysOnTop"`
 }
 
 type DesktopService struct {
@@ -56,6 +57,8 @@ func newDesktopService(logger *slog.Logger) *DesktopService {
 func (s *DesktopService) setApp(app *application.App) {
 	s.app = app
 	s.toast = NewToastManager(app)
+	// 通知窗口按设置决定是否置顶（创建前就定好，避免先置顶再撤回的闪烁）
+	s.toast.SetAlwaysOnTop(s.settings.Get().NotificationAlwaysOnTop)
 }
 
 func (s *DesktopService) createMainWindow() {
@@ -266,8 +269,9 @@ func (s *DesktopService) SetCloseBehaviorSetting(value CloseBehaviorSetting) err
 func (s *DesktopService) GetNotificationSettings() NotificationSettings {
 	settings := s.settings.Get()
 	return NotificationSettings{
-		ShowNotificationWindow: settings.ShowNotificationWindow,
-		NotificationDuration:   settings.NotificationDuration,
+		ShowNotificationWindow:  settings.ShowNotificationWindow,
+		NotificationDuration:    settings.NotificationDuration,
+		NotificationAlwaysOnTop: settings.NotificationAlwaysOnTop,
 	}
 }
 
@@ -275,7 +279,15 @@ func (s *DesktopService) SetNotificationSettings(value NotificationSettings) err
 	settings := s.settings.Get()
 	settings.ShowNotificationWindow = value.ShowNotificationWindow
 	settings.NotificationDuration = value.NotificationDuration
-	return s.settings.Set(settings)
+	settings.NotificationAlwaysOnTop = value.NotificationAlwaysOnTop
+	if err := s.settings.Set(settings); err != nil {
+		return err
+	}
+	// 立即生效，无需等待下一次通知
+	if s.toast != nil {
+		s.toast.SetAlwaysOnTop(value.NotificationAlwaysOnTop)
+	}
+	return nil
 }
 
 func (s *DesktopService) GetAccounts() ([]Account, error) {

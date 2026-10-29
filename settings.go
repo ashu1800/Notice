@@ -10,18 +10,20 @@ import (
 )
 
 type Settings struct {
-	ShowLauncherOnStartup  bool `json:"showLauncherOnStartup"`
-	CloseToTray            bool `json:"closeToTray"`
-	ShowNotificationWindow bool `json:"showNotificationWindow"`
-	NotificationDuration   int  `json:"notificationDuration"`
+	ShowLauncherOnStartup   bool `json:"showLauncherOnStartup"`
+	CloseToTray             bool `json:"closeToTray"`
+	ShowNotificationWindow  bool `json:"showNotificationWindow"`
+	NotificationDuration    int  `json:"notificationDuration"`
+	NotificationAlwaysOnTop bool `json:"notificationAlwaysOnTop"`
 }
 
 func defaultSettings() Settings {
 	return Settings{
-		ShowLauncherOnStartup:  false,
-		CloseToTray:            false,
-		ShowNotificationWindow: true,
-		NotificationDuration:   5,
+		ShowLauncherOnStartup:   false,
+		CloseToTray:             false,
+		ShowNotificationWindow:  true,
+		NotificationDuration:    5,
+		NotificationAlwaysOnTop: true,
 	}
 }
 
@@ -63,7 +65,9 @@ func (s *SettingsStore) load() {
 		}
 		return
 	}
-	var value Settings
+	// 从默认值起步再覆盖：新增字段在旧配置文件里缺失时
+	// 保留默认行为，而不是被解码成零值（例如通知置顶变成关闭）。
+	value := defaultSettings()
 	data = bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF})
 	if err := json.Unmarshal(data, &value); err != nil {
 		s.logger.Warn("设置文件损坏，使用默认设置", "error", err)
