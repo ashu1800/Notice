@@ -10,7 +10,9 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 import * as $models from "./models.js";
 
 /**
- * CheckForUpdates 打开 Wails 内置更新窗口，检查 GitHub Release 并按提示下载安装。
+ * CheckForUpdates 打开 Wails 内置更新窗口，检查更新源并按提示下载安装。
+ * 安装在不可写目录（例如 Program Files）时，内置更新器无法落盘，
+ * 改为打开下载页，让用户用安装包覆盖升级。
  */
 export function CheckForUpdates(): $CancellablePromise<void> {
     return $Call.ByID(897995752);
