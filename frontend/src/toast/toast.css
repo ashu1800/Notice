@@ -47,8 +47,8 @@ body {
 .toast-item {
   position: relative;
   width: 420px;
-  min-height: 80px;
-  padding: 14px 42px 16px 16px;
+  min-height: 92px;
+  padding: 16px 46px 18px 18px;
   border-radius: var(--toast-radius);
   border: 1px solid var(--line-strong, rgba(17, 24, 22, 0.28));
   background: color-mix(in srgb, var(--surface-raised, #fbfcf7) 90%, transparent);
@@ -69,16 +69,16 @@ body {
   margin-bottom: 3px;
   color: var(--ink, #111816);
   font-family: var(--font-display, "Bahnschrift", sans-serif);
-  font-size: 17px;
+  font-size: 21px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .toast-message {
   color: var(--ink-soft, #4d5952);
-  font-size: 11px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.65;
   overflow-wrap: anywhere;
 }
 
@@ -98,7 +98,7 @@ body {
   padding: 1px 4px;
   border-radius: 4px;
   background: var(--code-bg);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .toast-message pre {
@@ -118,7 +118,7 @@ body {
   border: 0;
   background: transparent;
   color: var(--text-tertiary);
-  font-size: 20px;
+  font-size: 23px;
   line-height: 1;
   cursor: pointer;
 }

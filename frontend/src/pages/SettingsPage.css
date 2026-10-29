@@ -123,15 +123,14 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 32px;
-  padding: 0 11px;
+  min-height: 34px;
+  padding: 0 12px;
   border: 1px solid transparent;
   border-radius: 1px 6px 1px 1px;
   background: transparent;
-  color: var(--ink-faint);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
   transition:
     color 160ms ease,
     background-color 160ms ease,
@@ -139,7 +138,7 @@
 }
 
 .theme-btn:hover {
-  color: var(--ink-soft);
+  color: var(--ink);
 }
 
 .theme-btn.active {
@@ -358,4 +357,14 @@
   .settings-version {
     display: none;
   }
+}
+
+/* 页面内所有文字（含等宽标签、标题、输入框、按钮）统一微软雅黑。
+   全局与页面内都用了 .class element 这类更高优先级的 font-family 声明，
+   逐个改写会漏，这里用 !important 一次覆盖到底。 */
+.settings-page,
+.settings-page *,
+.settings-page *::before,
+.settings-page *::after {
+  font-family: "Microsoft YaHei UI", "Microsoft YaHei", "微软雅黑", "PingFang SC", sans-serif !important;
 }
